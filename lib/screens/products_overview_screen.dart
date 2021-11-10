@@ -20,7 +20,23 @@ class ProductsOverviewScreen extends StatelessWidget {
       description: 'A nice pair of trousers.',
       price: 59.99,
       imageUrl:
-          'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Trous',
+          'https://images.sportsdirect.com/images/products/36206203_l.jpg',
+    ),
+    Product(
+      id: 'p3',
+      title: 'Blanket',
+      description: 'My favorite blanket',
+      price: 99.99,
+      imageUrl:
+          'https://m.media-amazon.com/images/I/71THWcYwDML._AC_SL1500_.jpg',
+    ),
+    Product(
+      id: 'p4',
+      title: 'Pan',
+      description: 'Frying pan',
+      price: 69.99,
+      imageUrl:
+          'https://m.media-amazon.com/images/I/819hzZIFNuL._AC_SL1500_.jpg',
     ),
   ];
 
