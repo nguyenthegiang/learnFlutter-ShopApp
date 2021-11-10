@@ -9,8 +9,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'MyShop',
+      /* My modification: accentColor bị deprecated rồi nên mình dùng
+      colorScheme.secondary */
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.purple)
+            .copyWith(secondary: Colors.deepOrange),
+        fontFamily: 'Lato',
       ),
       home: ProductsOverviewScreen(),
     );
