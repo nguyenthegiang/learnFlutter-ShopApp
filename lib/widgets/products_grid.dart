@@ -25,10 +25,17 @@ class ProductsGrid extends StatelessWidget {
     return GridView.builder(
       padding: const EdgeInsets.all(10.0),
       itemCount: products.length,
-      itemBuilder: (ctx, i) => ProductItem(
-        products[i].id,
-        products[i].title,
-        products[i].imageUrl,
+      /*Với mỗi ProductItem thì tạo cho nó 1 Data Provider với data là 1 Product
+      ở đây -> thay vì phải truyền các giá trị xuống thì nó có thể lấy dữ liệu
+      về Product thông qua Provider, và mỗi khi isFavorite thay đổi thì nó sẽ
+      được thông báo -> rebuild*/
+      itemBuilder: (ctx, i) => ChangeNotifierProvider(
+        create: (c) => products[i],
+        child: ProductItem(
+            // products[i].id,
+            // products[i].title,
+            // products[i].imageUrl,
+            ),
       ),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,

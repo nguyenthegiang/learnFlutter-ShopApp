@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../models/product.dart';
+import 'product.dart';
 
 //Class chứa data cho Data Provider phải mix-in với ChangeNotifier
 class Products with ChangeNotifier {
@@ -49,6 +49,11 @@ class Products with ChangeNotifier {
     notifyListeners() để thực hiện thông báo cho các listener -> mình cần kiểm 
     soát đc khi nào list product thay đổi Ở ĐÂY, nếu mình để cho bên ngoài thay 
     đổi mà mình ko biết thì sẽ ko gọi đến notifyListener() đc */
+  }
+
+  //function này để product_detail_screen dùng
+  Product findById(String id) {
+    return _items.firstWhere((product) => product.id == id);
   }
 
   void addProduct() {
