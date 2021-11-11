@@ -39,8 +39,14 @@ class Products with ChangeNotifier {
     ),
   ];
 
+  // var _showFavoritesOnly = false;
+
   //Getter
   List<Product> get items {
+    // if (_showFavoritesOnly) {
+    //   return _items.where((prodItem) => prodItem.isFavorite).toList();
+    // }
+
     /* Không return về property, mà chỉ return về 1 bản sao của nó thôi, vì 
     property này là 1 List -> nếu return về nó thì là return về địa chỉ của nó 
     -> nó sẽ có thể bị thay đổi từ bên ngoài */
@@ -51,10 +57,25 @@ class Products with ChangeNotifier {
     đổi mà mình ko biết thì sẽ ko gọi đến notifyListener() đc */
   }
 
+  //function dùng trong products_grid, để chỉ lấy ra những favorite product thôi
+  List<Product> get favoriteItems {
+    return _items.where((prodItem) => prodItem.isFavorite).toList();
+  }
+
   //function này để product_detail_screen dùng
   Product findById(String id) {
     return _items.firstWhere((product) => product.id == id);
   }
+
+  // void showFavoritesOnly() {
+  //   _showFavoritesOnly = true;
+  //   notifyListeners();
+  // }
+
+  // void showAll() {
+  //   _showFavoritesOnly = false;
+  //   notifyListeners();
+  // }
 
   void addProduct() {
     notifyListeners();

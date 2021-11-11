@@ -6,6 +6,12 @@ import '../providers/products.dart';
 import './product_item.dart';
 
 class ProductsGrid extends StatelessWidget {
+  //Biến để lưu trữ xem ng dùng chọn show favorite hay show all
+  final bool showFavs;
+
+  //nhận về giá trị biến này từ products_overview
+  ProductsGrid(this.showFavs);
+
   @override
   Widget build(BuildContext context) {
     /*Tạo Listener (chỉ có child (trực tiếp hoặc gián tiếp) của data provider 
@@ -19,7 +25,8 @@ class ProductsGrid extends StatelessWidget {
     /* giờ đây productsData sẽ là 1 bản sao của List Product trong 
     providers/products.dart (lấy thông qua getter mà mình tạo ở đó) */
 
-    final products = productsData.items;
+    //tùy vào người dùng chọn show favorite hay show all mà lấy list product tương ứng
+    final products = showFavs ? productsData.favoriteItems : productsData.items;
     /*truy cập thông qua .items -> giờ products sẽ là list product mà mình sử dụng */
 
     return GridView.builder(
