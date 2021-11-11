@@ -15,6 +15,11 @@ class MyApp extends StatelessWidget {
     1 Provider, và tạo 1 Data Container ở đây -> Khi Data Container thay đổi, 
     những child của nó mà listen cái data container này sẽ đc rebuild
     (Widget này cũng giúp các child của nó có thể tạo Listener) */
+
+    /* Chỗ này cũng có thể dùng ChangeNotifierProvider.value thay vì 
+    ChangeNotifierProvider cho đỡ thừa cái context, nhưng Data ở đây là 1 
+    Object mà khi truyền vào mới đc khởi tạo -> nên dùng ChangeNotifierProvider
+    thì nó hợp lý hơn và tránh bug */
     return ChangeNotifierProvider(
       /*Phải có argument này: 
         - Với provider package version <= 3.0 : builder

@@ -29,8 +29,14 @@ class ProductsGrid extends StatelessWidget {
       ở đây -> thay vì phải truyền các giá trị xuống thì nó có thể lấy dữ liệu
       về Product thông qua Provider, và mỗi khi isFavorite thay đổi thì nó sẽ
       được thông báo -> rebuild*/
-      itemBuilder: (ctx, i) => ChangeNotifierProvider(
-        create: (c) => products[i],
+      itemBuilder: (ctx, i) => ChangeNotifierProvider.value(
+        /*Dùng ChangeNotifierProvider.value vì nó sẽ có argument value thay vì
+        create -> value thì chỉ nhận Data thôi chứ ko cần function (context) => Data
+        -> đỡ bị thừa cái context
+        Và có 2 điều kiện phù hợp để dùng:
+          - Dùng Provider với Grid
+          - Data truyền vào là 1 Object đã đc khởi tạo từ trc rồi*/
+        value: products[i],
         child: ProductItem(
             // products[i].id,
             // products[i].title,
