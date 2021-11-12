@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../widgets/app_drawer.dart';
 import '../providers/cart.dart';
 import '../screens/cart_screen.dart';
 import '../widgets/badge.dart';
@@ -73,6 +74,8 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
           ),
         ],
       ),
+      //Drawer: cái menu từ phía bên trái
+      drawer: AppDrawer(),
       //Truyền lựa chọn về ProductsGrid để hiển thị tương ứng
       body: ProductsGrid(_showOnlyFavorites),
     );

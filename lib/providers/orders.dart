@@ -1,7 +1,7 @@
 // ignore_for_file: file_names
 
-import 'package:flutter/cupertino.dart';
-import 'package:shop_app/providers/cart.dart';
+import 'package:flutter/material.dart';
+import '../providers/cart.dart';
 
 //Chứa 1 sản phẩm trong Order
 class OrderItem {
