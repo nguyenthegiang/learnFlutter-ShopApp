@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shop_app/providers/Orders.dart';
+import '../providers/orders.dart';
 
 /* Vì trong cart.dart cũng có Class CartItem, nhưng mình ko cần nó, mình chỉ cần
 Class Cart trong cart.dart thôi; bên cạnh đó, mình cần Class CartItem trong
@@ -44,7 +44,7 @@ class CartScreen extends StatelessWidget {
                   Chip(
                     //truy cập đến tổng price thông qua Provider
                     label: Text(
-                      '\$ ${cart.totalAmount}',
+                      '\$ ${cart.totalAmount.toStringAsFixed(2)}',
                       style: TextStyle(
                           color: Theme.of(context)
                               .primaryTextTheme
