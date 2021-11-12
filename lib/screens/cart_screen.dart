@@ -1,8 +1,12 @@
-import 'dart:collection';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/cart.dart';
+
+/* Vì trong cart.dart cũng có Class CartItem, nhưng mình ko cần nó, mình chỉ cần
+Class Cart trong cart.dart thôi; bên cạnh đó, mình cần Class CartItem trong
+cart_item.dart => mình không muốn file này có thể gọi đến 2 Class cùng tên
+-> bị trùng -> trong cart.dart mình chỉ truy xuất đến class Cart thôi! */
+import '../providers/cart.dart' show Cart;
+import '../widgets/cart_item.dart';
 
 class CartScreen extends StatelessWidget {
   static const routeName = '/cart';
@@ -53,13 +57,29 @@ class CartScreen extends StatelessWidget {
                   /* FlatButton deprecated rồi nên mình chuyển sang TextButton
                   làm theo migration guide */
                   TextButton(
-                    child: Text('ORDER NOW'),
+                    child: const Text('ORDER NOW'),
                     onPressed: () {},
                     style: TextButton.styleFrom(
                       primary: Theme.of(context).colorScheme.primary,
                     ),
                   ),
                 ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 10),
+          //List các CartItem
+          //Muốn dùng ListView trong Column thì phải Wrap = Expanded
+          Expanded(
+            child: ListView.builder(
+              //Gọi đến Provider
+              itemCount: cart.items.length,
+              itemBuilder: (ctx, i) => CartItem(
+                cart.items.values.toList()[i].id,
+                cart.items.keys.toList()[i], //productId là key
+                cart.items.values.toList()[i].price,
+                cart.items.values.toList()[i].quantity,
+                cart.items.values.toList()[i].title,
               ),
             ),
           ),

@@ -82,4 +82,12 @@ class Cart with ChangeNotifier {
     //đừng quên gọi function này
     notifyListeners();
   }
+
+  //xóa 1 item: dùng trong cart_item.dart
+  void removeItem(String productId) {
+    //remove by key
+    _items.remove(productId);
+
+    notifyListeners();
+  }
 }
