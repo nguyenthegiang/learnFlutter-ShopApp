@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 //import Provider Package để dùng
 import 'package:provider/provider.dart';
 
+import './screens/cart_screen.dart';
 import './screens/product_detail_screen.dart';
 import './screens/products_overview_screen.dart';
 import './providers/products.dart';
@@ -44,6 +45,8 @@ class MyApp extends StatelessWidget {
         /* My modification: accentColor bị deprecated rồi nên mình dùng
         colorScheme.secondary */
         theme: ThemeData(
+          /* Muốn truy cập vào primaryColor: colorScheme.primary;
+            Muốn truy cập vào accentColor: colorScheme.secondary; */
           colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.purple)
               .copyWith(secondary: Colors.deepOrange),
           fontFamily: 'Lato',
@@ -51,6 +54,7 @@ class MyApp extends StatelessWidget {
         home: ProductsOverviewScreen(),
         routes: {
           ProductDetailScreen.routeName: (ctx) => ProductDetailScreen(),
+          CartScreen.routeName: (ctx) => CartScreen(),
         },
       ),
     );

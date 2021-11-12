@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../providers/cart.dart';
+import '../screens/cart_screen.dart';
+import '../widgets/badge.dart';
 import '../widgets/products_grid.dart';
 
 /*Tạo enum này chỉ để lưu trữ các giá trị đc chọn trong PopupMenuButton cho 
@@ -48,7 +52,25 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
                 value: FilterOptions.All,
               ),
             ],
-          )
+          ),
+
+          /*số hiển thị trên icon cart là số item có trong cart
+            dùng Cart Provider => Phải set up Listener*/
+          Consumer<Cart>(
+            //Custom Widget của thầy
+            builder: (_, cart, ch) => Badge(
+              child: ch as Widget,
+              //số này này
+              value: cart.itemCount.toString(),
+            ),
+            //
+            child: IconButton(
+              icon: const Icon(Icons.shopping_cart),
+              onPressed: () {
+                Navigator.of(context).pushNamed(CartScreen.routeName);
+              },
+            ),
+          ),
         ],
       ),
       //Truyền lựa chọn về ProductsGrid để hiển thị tương ứng

@@ -18,7 +18,7 @@ class CartItem {
 //class lưu trữ 1 list các cartItem
 class Cart with ChangeNotifier {
   //Sử dụng map vì mỗi cartItem sẽ liên kết vs 1 Product thông qua ProductID
-  late Map<String, CartItem> _items;
+  late Map<String, CartItem> _items = {};
   //Map này có Key là ProductID và value là CartItem
 
   //Getter
@@ -26,6 +26,21 @@ class Cart with ChangeNotifier {
     /*Dùng Spread Operator để return về 1 bản copy của cái Map _items chứ ko 
     phải return về địa chỉ của nó*/
     return {..._items};
+  }
+
+  //Getter: get tổng số item trong cart để hiển thị ở cái icon cart trên appBar ở products_overview
+  int get itemCount {
+    //nếu map rỗng thì trả về 0
+    return _items.length;
+  }
+
+  //Getter: get tổng price, dùng cho cart_screen.dart
+  double get totalAmount {
+    var total = 0.0;
+    _items.forEach((key, cartItem) {
+      total += cartItem.price * cartItem.quantity;
+    });
+    return total;
   }
 
   //thêm 1 item: quantity thì + 1
@@ -63,5 +78,8 @@ class Cart with ChangeNotifier {
         ),
       );
     }
+
+    //đừng quên gọi function này
+    notifyListeners();
   }
 }

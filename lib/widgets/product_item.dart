@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../providers/cart.dart';
 import '../screens/product_detail_screen.dart';
 import '../providers/product.dart';
 
@@ -17,6 +18,9 @@ class ProductItem extends StatelessWidget {
     listen = false để nó ko phải rebuild cả Widget, phần nào cần rebuild thì 
     Wrap với Consumer*/
     final product = Provider.of<Product>(context, listen: false);
+
+    //sử dụng Cart Provider
+    final cart = Provider.of<Cart>(context, listen: false);
 
     /*1 cách khác để làm Listener: lấy dữ liệu từ Data Provider; khả năng y hệt 
     như Provider.of -> Đó là Consumer:
@@ -64,8 +68,11 @@ class ProductItem extends StatelessWidget {
             textAlign: TextAlign.center,
           ),
           trailing: IconButton(
-            icon: Icon(Icons.shopping_cart),
-            onPressed: () {},
+            icon: const Icon(Icons.shopping_cart),
+            onPressed: () {
+              //Thêm sản phẩm vào cart thông qua Provider
+              cart.addItem(product.id, product.price, product.title);
+            },
             color: Theme.of(context).colorScheme.secondary,
           ),
         ),
