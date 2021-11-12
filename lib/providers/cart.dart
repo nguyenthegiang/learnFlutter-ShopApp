@@ -90,4 +90,11 @@ class Cart with ChangeNotifier {
 
     notifyListeners();
   }
+
+  //xóa cart: dùng khi add Cart vào Order
+  void clear() {
+    _items = {};
+
+    notifyListeners();
+  }
 }

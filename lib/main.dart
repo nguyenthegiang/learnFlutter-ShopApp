@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 //import Provider Package để dùng
 import 'package:provider/provider.dart';
 
+import './providers/Orders.dart';
 import './screens/cart_screen.dart';
 import './screens/product_detail_screen.dart';
 import './screens/products_overview_screen.dart';
@@ -37,6 +38,10 @@ class MyApp extends StatelessWidget {
         /* Tạo Provider cho Cart */
         ChangeNotifierProvider(
           create: (ctx) => Cart(),
+        ),
+        /* Tạo Provider cho Order */
+        ChangeNotifierProvider(
+          create: (ctx) => Orders(),
         ),
       ],
       //child : nó sẽ Listen cho tất cả các Provider trong list trên kia
