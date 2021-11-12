@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shop_app/providers/Orders.dart';
 
 /* Vì trong cart.dart cũng có Class CartItem, nhưng mình ko cần nó, mình chỉ cần
 Class Cart trong cart.dart thôi; bên cạnh đó, mình cần Class CartItem trong
@@ -58,7 +59,15 @@ class CartScreen extends StatelessWidget {
                   làm theo migration guide */
                   TextButton(
                     child: const Text('ORDER NOW'),
-                    onPressed: () {},
+                    onPressed: () {
+                      //ấn nút này thì add cart vào Order
+                      Provider.of<Orders>(context, listen: false).addOrder(
+                        cart.items.values.toList(),
+                        cart.totalAmount,
+                      );
+                      //Add Cart vào Order rồi thì clear cái Cart này đi thôi
+                      cart.clear();
+                    },
                     style: TextButton.styleFrom(
                       primary: Theme.of(context).colorScheme.primary,
                     ),
