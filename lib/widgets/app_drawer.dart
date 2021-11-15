@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../screens/orders_screen.dart';
+import '../screens/user_products_screen.dart';
 
 //Drawer để chuyển giữa product overview và order
 class AppDrawer extends StatelessWidget {
@@ -28,7 +29,7 @@ class AppDrawer extends StatelessWidget {
             },
           ),
 
-          const Divider(), //1 cái dòng như <hr>
+          const Divider(),
           ListTile(
             //Ấn vào cái này để đến Order Screen
             leading: const Icon(Icons.payment),
@@ -36,6 +37,17 @@ class AppDrawer extends StatelessWidget {
             onTap: () {
               Navigator.of(context)
                   .pushReplacementNamed(OrdersScreen.routeName);
+            },
+          ),
+
+          const Divider(),
+          ListTile(
+            //Ấn vào cái này để đến Manage Product Screen
+            leading: const Icon(Icons.edit),
+            title: const Text('Manage Products'),
+            onTap: () {
+              Navigator.of(context)
+                  .pushReplacementNamed(UserProductsScreen.routeName);
             },
           ),
         ],
