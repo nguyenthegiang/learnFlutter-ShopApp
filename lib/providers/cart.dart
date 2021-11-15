@@ -97,4 +97,28 @@ class Cart with ChangeNotifier {
 
     notifyListeners();
   }
+
+  //xóa 1 quantity trong cart item: dùng khi UNDO ở SnackBar
+  void removeSingleItem(String productId) {
+    if (!_items.containsKey(productId)) {
+      return;
+    }
+    //Nếu quantity > 1 -> xóa 1 quantity
+    if (_items[productId]!.quantity > 1) {
+      _items.update(
+        productId,
+        (existingCartItem) => CartItem(
+          id: existingCartItem.id,
+          title: existingCartItem.title,
+          quantity: existingCartItem.quantity - 1,
+          price: existingCartItem.price,
+        ),
+      );
+      //Nếu quantity = 1 -> xóa item
+    } else {
+      _items.remove(productId);
+    }
+
+    notifyListeners();
+  }
 }

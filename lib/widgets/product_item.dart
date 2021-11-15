@@ -72,6 +72,21 @@ class ProductItem extends StatelessWidget {
             onPressed: () {
               //Thêm sản phẩm vào cart thông qua Provider
               cart.addItem(product.id, product.price, product.title);
+
+              //Hiển thị Pop up
+              Scaffold.of(context).hideCurrentSnackBar();
+              Scaffold.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Added item to cart!'),
+                  duration: Duration(seconds: 2),
+                  action: SnackBarAction(
+                    label: 'UNDO',
+                    onPressed: () {
+                      cart.removeSingleItem(product.id);
+                    },
+                  ),
+                ),
+              );
             },
             color: Theme.of(context).colorScheme.secondary,
           ),

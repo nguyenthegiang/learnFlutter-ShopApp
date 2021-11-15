@@ -13,7 +13,7 @@ class OrdersScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     //set up Listener
     final orderData = Provider.of<Orders>(context);
-    print(orderData);
+    //print(orderData);
 
     return Scaffold(
       appBar: AppBar(
