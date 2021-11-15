@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../providers/products.dart';
 import '../widgets/user_product_item.dart';
 import '../widgets/app_drawer.dart';
+import '../screens/edit_product_screen.dart';
 
 //Quản lý Product: CRUD
 class UserProductsScreen extends StatelessWidget {
@@ -18,7 +19,13 @@ class UserProductsScreen extends StatelessWidget {
         title: const Text('Your Products'),
         actions: [
           //ấn nút để thêm Product
-          IconButton(icon: const Icon(Icons.add), onPressed: () {}),
+          IconButton(
+            icon: const Icon(Icons.add),
+            onPressed: () {
+              //push cái screen này vào stack
+              Navigator.of(context).pushNamed(EditProductScreen.routeName);
+            },
+          ),
         ],
       ),
       //1 cái app drawer như các màn hình
