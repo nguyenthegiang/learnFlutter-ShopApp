@@ -35,6 +35,33 @@ class CartItem extends StatelessWidget {
       ),
       //Chỉ có thể xóa = cách kéo từ phải sang trái
       direction: DismissDirection.endToStart,
+      //sau khi swipe thì hiển thị thông báo để ng dùng confirm
+      confirmDismiss: (direction) {
+        return showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: const Text('Are you sure?'),
+            content:
+                const Text('Do you want to remove the item from the cart?'),
+            actions: [
+              TextButton(
+                child: const Text('No'),
+                onPressed: () {
+                  Navigator.of(ctx).pop(false);
+                  //showDialog return về Future<bool> = false
+                },
+              ),
+              TextButton(
+                child: const Text('Yes'),
+                onPressed: () {
+                  Navigator.of(ctx).pop(true);
+                  //showDialog return về Future<bool> = true
+                },
+              ),
+            ],
+          ),
+        );
+      },
       onDismissed: (direction) {
         //khi xóa thì cũng xóa trong Provider
         Provider.of<Cart>(
