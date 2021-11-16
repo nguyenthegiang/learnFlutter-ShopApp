@@ -40,6 +40,14 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
   void _updateImageUrl() {
     if (!_iamgeUrlFocusNode.hasFocus) {
+      //validate image cả khi Preview nữa
+      if ((!_imageUrlController.text.startsWith('http') &&
+              !_imageUrlController.text.startsWith('https')) ||
+          (!_imageUrlController.text.endsWith('.png') &&
+              !_imageUrlController.text.endsWith('.jpg') &&
+              !_imageUrlController.text.endsWith('.jpeg'))) {
+        return;
+      }
       //Khi thẻ input Image mất focus thì update state
       setState(() {});
     }
@@ -60,6 +68,16 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
   //Method để Submit Form
   void _saveForm() {
+    /* Trước khi save form thì validate -> gọi đến validate() của Form
+    -> nó sẽ gọi đến các function validator của TextFormField
+    -> validate() sẽ trả về true nếu tất cả các validator đều thỏa mãn,
+    chỉ cần 1 cái bị sai thì nó sẽ return false */
+    final isValid = _form.currentState!.validate();
+    if (!isValid) {
+      return;
+      //nếu validate sai thì ko lưu
+    }
+
     /* Interact vs From Widget để lấy dữ liệu đc Submit -> truy cập trực tiếp
     đến 1 Widget ở trong Code -> Sử dụng Global Key (khá ít dùng, chủ yếu cho
     Form như ở đây) */
@@ -68,10 +86,10 @@ class _EditProductScreenState extends State<EditProductScreen> {
     -> cho phép lấy value trong chúng và làm gì tùy ý (VD: lưu trong Map) */
 
     //Test
-    // print(_editedProduct.title);
-    // print(_editedProduct.description);
-    // print(_editedProduct.price);
-    // print(_editedProduct.imageUrl);
+    print(_editedProduct.title);
+    print(_editedProduct.description);
+    print(_editedProduct.price);
+    print(_editedProduct.imageUrl);
   }
 
   @override
@@ -99,6 +117,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
               TextFormField(
                 decoration: const InputDecoration(
                   labelText: 'Title',
+                  /*Có thể set thêm style cho error message ở đây
+                  (message sẽ hiển thị nếu validation bị sai)*/
                 ),
                 textInputAction: TextInputAction.next,
                 /*-> khi mở bàn phím lên thì vị trí chữ Enter sẽ là biểu tượng
@@ -124,6 +144,15 @@ class _EditProductScreenState extends State<EditProductScreen> {
                     id: '',
                   );
                 },
+                //validate user input
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    //Nếu input rỗng -> lỗi -> Thông báo lỗi
+                    return 'Please provide a value.';
+                  }
+                  //ko thì OK r
+                  return null;
+                },
               ),
               //Price
               TextFormField(
@@ -148,6 +177,21 @@ class _EditProductScreenState extends State<EditProductScreen> {
                     id: '',
                   );
                 },
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    //trg hợp để trống
+                    return 'Please enter a price.';
+                  }
+                  if (double.tryParse(value) == null) {
+                    //trường hợp input ko phải số
+                    return 'Please enter a valid number.';
+                  }
+                  if (double.parse(value) <= 0) {
+                    //trg hợp số <= 0
+                    return 'Please enter a number greater than zero.';
+                  }
+                  return null;
+                },
               ),
               //Description
               TextFormField(
@@ -169,6 +213,15 @@ class _EditProductScreenState extends State<EditProductScreen> {
                     imageUrl: _editedProduct.imageUrl,
                     id: '',
                   );
+                },
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return 'Please enter a description.';
+                  }
+                  if (value.length < 10) {
+                    return 'Should be at least 10 characters long.';
+                  }
+                  return null;
                 },
               ),
               //Image
@@ -225,6 +278,22 @@ class _EditProductScreenState extends State<EditProductScreen> {
                           imageUrl: value ?? '',
                           id: '',
                         );
+                      },
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return 'Please enter an image URL.';
+                        }
+                        if (!value.startsWith('http') &&
+                            !value.startsWith('https')) {
+                          return 'Please enter a valid URL.';
+                        }
+                        //có thể check thêm xem link có phải image ko nếu muốn
+                        if (!value.endsWith('.png') &&
+                            !value.endsWith('.jpg') &&
+                            !value.endsWith('.jpeg')) {
+                          return 'Please enter a valid image URL.';
+                        }
+                        return null;
                       },
                     ),
                   ),
