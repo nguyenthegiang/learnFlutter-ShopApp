@@ -77,7 +77,18 @@ class Products with ChangeNotifier {
   //   notifyListeners();
   // }
 
-  void addProduct() {
+  //Add 1 product vào List, dùng trong edit_product_screen
+  void addProduct(Product product) {
+    final newProduct = Product(
+      id: DateTime.now().toString(), //unique id
+      title: product.title,
+      description: product.description,
+      price: product.price,
+      imageUrl: product.imageUrl,
+    );
+
+    _items.add(newProduct);
+
     notifyListeners();
   }
 }

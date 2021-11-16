@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../providers/products.dart';
 import '../providers/product.dart';
 
 //Dùng chung Screen này để Edit Product và Add Product vì UI như nhau
@@ -85,11 +87,10 @@ class _EditProductScreenState extends State<EditProductScreen> {
     /* save() sẽ trigger method ở onSaved ở tất cả các TextFormField 
     -> cho phép lấy value trong chúng và làm gì tùy ý (VD: lưu trong Map) */
 
-    //Test
-    print(_editedProduct.title);
-    print(_editedProduct.description);
-    print(_editedProduct.price);
-    print(_editedProduct.imageUrl);
+    //Add vào List
+    Provider.of<Products>(context, listen: false).addProduct(_editedProduct);
+    //Tự động rời Page -> về page trc
+    Navigator.of(context).pop();
   }
 
   @override
