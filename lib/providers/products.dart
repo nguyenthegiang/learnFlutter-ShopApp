@@ -91,4 +91,26 @@ class Products with ChangeNotifier {
 
     notifyListeners();
   }
+
+  //Function update Product vào Provider, dùng khi Edit ở edit product screen
+  void updateProduct(String id, Product newProduct) {
+    //tìm index của item có id này
+    final prodIndex = _items.indexWhere((prod) => prod.id == id);
+    //nếu tìm đc thì sửa
+    if (prodIndex >= 0) {
+      //sửa item
+      _items[prodIndex] = newProduct;
+
+      notifyListeners();
+    } else {
+      print('can\'t find product!');
+    }
+  }
+
+  //Delete
+  void deleteProduct(String id) {
+    _items.removeWhere((prod) => prod.id == id);
+
+    notifyListeners();
+  }
 }

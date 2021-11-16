@@ -31,13 +31,60 @@ class _EditProductScreenState extends State<EditProductScreen> {
     price: 0,
     imageUrl: '',
   );
+  //biến dùng để kiểm tra xem đây có phải lần chạy init ko
+  var _isInit = true;
+  /*biến để lưu trữ giá trị khởi điểm của các TextField
+      - nếu là add mới thì rỗng
+      - nếu là edit thì có*/
+  var _initValues = {
+    'title': '',
+    'description': '',
+    'price': '',
+    'imageUrl': '',
+  };
 
   @override
   void initState() {
     /*Tạo Listener cho _iamgeUrlFocusNode -> mỗi khi focus thay đổi thì chạy
     function _updateImageUrl()*/
     _iamgeUrlFocusNode.addListener(_updateImageUrl);
+
     super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    /*Nếu là Edit: lấy ID của Product truyền sang để tìm product tương ứng; 
+      Nếu để code ở initState() thì hoàn hảo, nhưng ở đó lại ko gọi đc  nên 
+      phải làm ở đây, và dùng _isInit để đảm bảo code này chỉ chạy 1 lần*/
+    if (_isInit) {
+      //Lấy id từ argument (có thể null)
+      final String? productId =
+          ModalRoute.of(context)!.settings.arguments as String?;
+
+      //nếu add mới product -> ko có argument -> nếu thế thì ko làm đoạn dưới này
+      if (productId != null) {
+        //tìm product có id tương ứng, gán vào product của Widget này
+        _editedProduct = Provider.of<Products>(
+          context,
+          listen: false,
+        ).findById(productId);
+
+        //gán vào biến để gán vào textField
+        _initValues = {
+          'title': _editedProduct.title,
+          'description': _editedProduct.description,
+          'price': _editedProduct.price.toString(),
+          //ko set initialValue cho textField có controller đc
+          //'imageUrl': _editedProduct.imageUrl,
+        };
+        //mà phải gán initalValue cho controller
+        _imageUrlController.text = _editedProduct.imageUrl;
+      }
+    }
+    _isInit = false;
+
+    super.didChangeDependencies();
   }
 
   void _updateImageUrl() {
@@ -87,8 +134,18 @@ class _EditProductScreenState extends State<EditProductScreen> {
     /* save() sẽ trigger method ở onSaved ở tất cả các TextFormField 
     -> cho phép lấy value trong chúng và làm gì tùy ý (VD: lưu trong Map) */
 
-    //Add vào List
-    Provider.of<Products>(context, listen: false).addProduct(_editedProduct);
+    //Kiểm tra xem đang là Edit hay Add để thực hiện tương ứng
+    if (_editedProduct.id != '') {
+      //Edit--
+      //Nếu id ko phải '' thì là lấy từ Provider -> là Edit
+      Provider.of<Products>(context, listen: false)
+          .updateProduct(_editedProduct.id, _editedProduct);
+    } else {
+      //Add--
+      //Add vào List
+      Provider.of<Products>(context, listen: false).addProduct(_editedProduct);
+    }
+
     //Tự động rời Page -> về page trc
     Navigator.of(context).pop();
   }
@@ -142,7 +199,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
                     price: _editedProduct.price,
                     description: _editedProduct.description,
                     imageUrl: _editedProduct.imageUrl,
-                    id: '',
+                    id: _editedProduct.id,
+                    isFavorite: _editedProduct.isFavorite,
                   );
                 },
                 //validate user input
@@ -154,6 +212,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
                   //ko thì OK r
                   return null;
                 },
+                //Gán giá trị khởi đầu (nếu là Edit)
+                initialValue: _initValues['title'],
               ),
               //Price
               TextFormField(
@@ -175,7 +235,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
                     price: double.parse(value ?? ''),
                     description: _editedProduct.description,
                     imageUrl: _editedProduct.imageUrl,
-                    id: '',
+                    id: _editedProduct.id,
+                    isFavorite: _editedProduct.isFavorite,
                   );
                 },
                 validator: (value) {
@@ -193,6 +254,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                   }
                   return null;
                 },
+                initialValue: _initValues['price'],
               ),
               //Description
               TextFormField(
@@ -212,7 +274,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
                     price: _editedProduct.price,
                     description: value ?? '',
                     imageUrl: _editedProduct.imageUrl,
-                    id: '',
+                    id: _editedProduct.id,
+                    isFavorite: _editedProduct.isFavorite,
                   );
                 },
                 validator: (value) {
@@ -224,6 +287,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                   }
                   return null;
                 },
+                initialValue: _initValues['description'],
               ),
               //Image
               Row(
@@ -277,7 +341,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
                           price: _editedProduct.price,
                           description: _editedProduct.description,
                           imageUrl: value ?? '',
-                          id: '',
+                          id: _editedProduct.id,
+                          isFavorite: _editedProduct.isFavorite,
                         );
                       },
                       validator: (value) {
@@ -296,6 +361,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
                         }
                         return null;
                       },
+                      //ko set initialValue cho textField có controller đc
+                      // initialValue: _initValues['imageUrl'],
                     ),
                   ),
                 ],
