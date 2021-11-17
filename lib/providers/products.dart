@@ -83,13 +83,22 @@ class Products with ChangeNotifier {
   // }
 
   //Add 1 product vào List, dùng trong edit_product_screen
-  void addProduct(Product product) {
+  /* Cho function này return về Future, để phía bên UI mình có thể code để
+  đợi send http requests xong */
+  Future<void> addProduct(Product product) {
     //Gửi HTTP Requests đến Server để lưu giữ liệu lên server
     const url =
         'https://learn-flutter-shop-app-7cbf5-default-rtdb.firebaseio.com/products.json';
     /* Link đến Server: thêm cái /products.json để kiểu tạo 1 table Products
     (chỉ có Firebase mới làm đc tn thôi) */
-    http
+
+    /* Muốn cho function này return về Future:
+        - Nếu return sau khi chạy toàn bộ đoạn http.post().then()... thì nó
+        sẽ return luôn chứ ko chờ code chạy xong
+        - Nếu return trong then() thì nó lại sai vì phải return ở bên ngoài
+      -> return về cả khối http.post().then()... này luôn, vì then() cx return
+      về future mà*/
+    return http
         .post(
       Uri.parse(url),
       body: json.encode({
