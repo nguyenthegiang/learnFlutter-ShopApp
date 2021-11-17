@@ -89,7 +89,8 @@ class Products with ChangeNotifier {
         'https://learn-flutter-shop-app-7cbf5-default-rtdb.firebaseio.com/products.json';
     /* Link đến Server: thêm cái /products.json để kiểu tạo 1 table Products
     (chỉ có Firebase mới làm đc tn thôi) */
-    http.post(
+    http
+        .post(
       Uri.parse(url),
       body: json.encode({
         'title': product.title,
@@ -98,8 +99,7 @@ class Products with ChangeNotifier {
         'price': product.price,
         'isFavorite': product.isFavorite,
       }),
-    );
-    /* Dùng package http để gửi 1 Post request đến url đó;
+      /* Dùng package http để gửi 1 Post request đến url đó;
       1 số argument: 
         - url: (version mới của package http) chỉ chấp nhận object Uri thôi
               -> phải parse
@@ -107,18 +107,25 @@ class Products with ChangeNotifier {
         - body: phải truyền vào JSON data:
           + import dart:convert để convert data sang JSON 
           + tạo map và convert nó sang JSON*/
+    )
+        /* Gọi then() để có thể thao tác với response và Server trả về */
+        .then((response) {
+      final newProduct = Product(
+        id: json.decode(response.body)['name'],
+        /*id lấy từ ID và Server gen ra
+        phải convert từ JSON sang Map -> lấy value của key 'name'*/
+        title: product.title,
+        description: product.description,
+        price: product.price,
+        imageUrl: product.imageUrl,
+      );
 
-    final newProduct = Product(
-      id: DateTime.now().toString(), //unique id
-      title: product.title,
-      description: product.description,
-      price: product.price,
-      imageUrl: product.imageUrl,
-    );
+      _items.add(newProduct);
 
-    _items.add(newProduct);
-
-    notifyListeners();
+      notifyListeners();
+      /*Khi này phải đợi 1 lúc thì Flutter App mới reload đc vì phải đợi 
+      gửi request và server response*/
+    });
   }
 
   //Function update Product vào Provider, dùng khi Edit ở edit product screen
