@@ -134,6 +134,16 @@ class Products with ChangeNotifier {
       notifyListeners();
       /*Khi này phải đợi 1 lúc thì Flutter App mới reload đc vì phải đợi 
       gửi request và server response*/
+    }).catchError((error) {
+      /* error handling ở đây -> nếu xảy ra lỗi gì ở mấy function trên kia
+      thì chạy function này (khi send http request thì có thể có rất nhiều
+      loại lỗi xảy ra, phải cẩn thận) */
+      print(error); //print error ra
+      /* Làm gì cx đc, quan trọng là có catch Error thì App nó sẽ ko Crash nữa*/
+
+      throw (error); //lại throw error ra
+      /* catch r lại throw ra vì mình muốn catch ở chỗ khác nữa 
+      (ở bên ngoài edit_product_screen) */
     });
   }
 

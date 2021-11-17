@@ -167,7 +167,39 @@ class _EditProductScreenState extends State<EditProductScreen> {
         Bên cạnh đó thì trong lúc đợi Future load xong thì hiển thị hình loading */
       Provider.of<Products>(context, listen: false)
           .addProduct(_editedProduct)
-          .then((_) {
+          .catchError((error) {
+        /* catchError ở đây sẽ bắt bất cứ error nào tung ra ở trong addProduct()
+        ở đây thì mình đang ở trong Widget -> có thể xử lý Error: hiển thị lên
+        để thông báo cho User;
+        ở đây mình hiển thị dialog lên*/
+
+        /*
+        - (May mắn là) dù xảy ra lỗi và mình chỉ catch thì đoạn code then() 
+        phía dưới vẫn chạy, vì catchError() cũng return về 1 Future, nên 
+        màn hình cx ko bị spinner mãi mà sẽ quay về trang trc nhờ 
+        Navigator.of(context).pop();
+        - Nhưng mình muốn đợi người dùng nhấn Okay để đóng cái Dialog lại rồi
+        mới quay về trang trc -> return về showDialog(), mà showDialog cũng 
+        return về Future -> không sao cả, mà, showDialog() chỉ return khi người
+        dùng đóng Dialog -> thỏa mãn điều kiện*/
+        return showDialog<Null>(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: Text('An error occurred!'),
+            content: Text('Something went wrong!'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  //gọi cái này để đóng Dialog (hoặc đóng bất cứ overlay nào)
+                  Navigator.of(ctx).pop();
+                },
+                child: Text('Okay'),
+              ),
+            ],
+          ),
+        );
+        /*  */
+      }).then((_) {
         /*Chuyển loading lại thành false vì đã load xong r 
         -> kết thúc hiển thị màn hình load*/
         setState(() {
