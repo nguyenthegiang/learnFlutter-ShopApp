@@ -1,4 +1,9 @@
+//import cái này để convert data sang JSON
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+//import cái này để gửi http request
+import 'package:http/http.dart' as http;
 
 import 'product.dart';
 
@@ -79,6 +84,30 @@ class Products with ChangeNotifier {
 
   //Add 1 product vào List, dùng trong edit_product_screen
   void addProduct(Product product) {
+    //Gửi HTTP Requests đến Server để lưu giữ liệu lên server
+    const url =
+        'https://learn-flutter-shop-app-7cbf5-default-rtdb.firebaseio.com/products.json';
+    /* Link đến Server: thêm cái /products.json để kiểu tạo 1 table Products
+    (chỉ có Firebase mới làm đc tn thôi) */
+    http.post(
+      Uri.parse(url),
+      body: json.encode({
+        'title': product.title,
+        'description': product.description,
+        'imagUrl': product.imageUrl,
+        'price': product.price,
+        'isFavorite': product.isFavorite,
+      }),
+    );
+    /* Dùng package http để gửi 1 Post request đến url đó;
+      1 số argument: 
+        - url: (version mới của package http) chỉ chấp nhận object Uri thôi
+              -> phải parse
+        - headers: chứa 1 số meta data (chưa cần)
+        - body: phải truyền vào JSON data:
+          + import dart:convert để convert data sang JSON 
+          + tạo map và convert nó sang JSON*/
+
     final newProduct = Product(
       id: DateTime.now().toString(), //unique id
       title: product.title,

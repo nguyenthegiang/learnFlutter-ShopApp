@@ -354,11 +354,12 @@ class _EditProductScreenState extends State<EditProductScreen> {
                           return 'Please enter a valid URL.';
                         }
                         //có thể check thêm xem link có phải image ko nếu muốn
-                        if (!value.endsWith('.png') &&
-                            !value.endsWith('.jpg') &&
-                            !value.endsWith('.jpeg')) {
-                          return 'Please enter a valid image URL.';
-                        }
+                        // if (!value.endsWith('.png') &&
+                        //     !value.endsWith('.jpg') &&
+                        //     !value.endsWith('.jpeg')) {
+                        //   return 'Please enter a valid image URL.';
+                        // }
+                        /* bỏ cái này đi, giờ đầy ảnh đuôi khác */
                         return null;
                       },
                       //ko set initialValue cho textField có controller đc
