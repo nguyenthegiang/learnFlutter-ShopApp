@@ -147,17 +147,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
     if (_editedProduct.id != '') {
       //Edit--
       //Nếu id ko phải '' thì là lấy từ Provider -> là Edit
-      Provider.of<Products>(context, listen: false)
+      await Provider.of<Products>(context, listen: false)
           .updateProduct(_editedProduct.id, _editedProduct);
-
-      /*Chuyển loading lại thành false vì đã load xong r 
-      -> kết thúc hiển thị màn hình load*/
-      setState(() {
-        _isLoading = false;
-      });
-
-      //Tự động rời Page -> về page trc
-      Navigator.of(context).pop();
     } else {
       //Add--
       //Add vào List
@@ -199,19 +190,27 @@ class _EditProductScreenState extends State<EditProductScreen> {
             ],
           ),
         );
-      } finally {
-        /*Chuyển loading lại thành false vì đã load xong r 
-        -> kết thúc hiển thị màn hình load*/
-        setState(() {
-          _isLoading = false;
-        });
-
-        //Tự động rời Page -> về page trc
-        Navigator.of(context).pop();
       }
+      // finally {
+      //   /*Chuyển loading lại thành false vì đã load xong r
+      //   -> kết thúc hiển thị màn hình load*/
+      //   setState(() {
+      //     _isLoading = false;
+      //   });
+
+      //   //Tự động rời Page -> về page trc
+      //   Navigator.of(context).pop();
+      // }
     }
 
-    //Navigator.of(context).pop();
+    /*Chuyển loading lại thành false vì đã load xong r 
+      -> kết thúc hiển thị màn hình load*/
+    setState(() {
+      _isLoading = false;
+    });
+
+    //Tự động rời Page -> về page trc
+    Navigator.of(context).pop();
   }
 
   @override

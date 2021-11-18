@@ -139,11 +139,33 @@ class Products with ChangeNotifier {
   }
 
   //Function update Product vào Provider, dùng khi Edit ở edit product screen
-  void updateProduct(String id, Product newProduct) {
+  Future<void> updateProduct(String id, Product newProduct) async {
     //tìm index của item có id này
     final prodIndex = _items.indexWhere((prod) => prod.id == id);
     //nếu tìm đc thì sửa
     if (prodIndex >= 0) {
+      /* --Update lên Web Server-- */
+
+      /*Phải truyền id của Product vào để truy cập đến product tương ứng
+       (tương tự như cấu trúc folder trên server thôi)
+       (vì id là truyền vào nên url ko thể là const)*/
+      final url =
+          'https://learn-flutter-shop-app-7cbf5-default-rtdb.firebaseio.com/products/$id.json';
+
+      /* Gửi PATCH request để update -> bảo Firebase merge cái data (có id kia)
+      với cái data truyền đến này 
+      (cái nào mình truyền lên thì sửa, cái nào mình ko truyền lên (isFavorite)
+      thì nó vẫn giữ)*/
+      await http.patch(
+        Uri.parse(url),
+        body: json.encode({
+          'title': newProduct.title,
+          'description': newProduct.description,
+          'imageUrl': newProduct.imageUrl,
+          'price': newProduct.price,
+        }),
+      );
+
       //sửa item
       _items[prodIndex] = newProduct;
 
