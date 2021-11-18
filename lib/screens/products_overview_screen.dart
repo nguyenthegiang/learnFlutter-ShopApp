@@ -6,6 +6,7 @@ import '../providers/cart.dart';
 import '../screens/cart_screen.dart';
 import '../widgets/badge.dart';
 import '../widgets/products_grid.dart';
+import '../providers/products.dart';
 
 /*Tạo enum này chỉ để lưu trữ các giá trị đc chọn trong PopupMenuButton cho 
 trực quan thôi*/
@@ -22,6 +23,44 @@ class ProductsOverviewScreen extends StatefulWidget {
 class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
   //Biến để lưu trữ xem ng dùng chọn show favorite hay show all
   var _showOnlyFavorites = false;
+  //Biến để cho didChangeDependencies() chỉ chạy 1 lần thôi
+  var _isInit = true;
+  //biến để làm loading spinner
+  var _isLoading = false;
+
+  @override
+  void initState() {
+    /* Khi mới vào product_overview (là khi mới khởi động app) thì load 
+    List Product từ Web Server về*/
+
+    // Provider.of<Products>(context).fetchAndSetProducts(); //SẼ LỖI
+
+    // Future.delayed(Duration.zero).then((_) {
+    //   Provider.of<Products>(context).fetchAndSetProducts();
+    // }); //không lỗi, nma hơi hack tí
+
+    super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    /* Khi mới vào product_overview (là khi mới khởi động app) thì load 
+    List Product từ Web Server về*/
+    if (_isInit) {
+      setState(() {
+        //chuyển màn hình sang loading
+        _isLoading = true;
+      });
+      Provider.of<Products>(context).fetchAndSetProducts().then((_) {
+        setState(() {
+          //chuyển màn hình lại bình thường sau khi lấy data xong
+          _isLoading = false;
+        });
+      });
+    }
+    _isInit = false;
+    super.didChangeDependencies();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -77,7 +116,12 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
       //Drawer: cái menu từ phía bên trái
       drawer: AppDrawer(),
       //Truyền lựa chọn về ProductsGrid để hiển thị tương ứng
-      body: ProductsGrid(_showOnlyFavorites),
+      //Nếu đang load thì hiển thị loading spinner
+      body: _isLoading
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : ProductsGrid(_showOnlyFavorites),
     );
   }
 }

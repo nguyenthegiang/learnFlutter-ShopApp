@@ -10,38 +10,38 @@ import 'product.dart';
 //Class chứa data cho Data Provider phải mix-in với ChangeNotifier
 class Products with ChangeNotifier {
   List<Product> _items = [
-    Product(
-      id: 'p1',
-      title: 'Red Shirt',
-      description: 'A red shirt - it is pretty red!',
-      price: 29.99,
-      imageUrl:
-          'https://cdn.pixabay.com/photo/2016/10/02/22/17/red-t-shirt-1710578_1280.jpg',
-    ),
-    Product(
-      id: 'p2',
-      title: 'Trousers',
-      description: 'A nice pair of trousers.',
-      price: 59.99,
-      imageUrl:
-          'https://images.sportsdirect.com/images/products/36206203_l.jpg',
-    ),
-    Product(
-      id: 'p3',
-      title: 'Blanket',
-      description: 'My favorite blanket',
-      price: 99.99,
-      imageUrl:
-          'https://m.media-amazon.com/images/I/71THWcYwDML._AC_SL1500_.jpg',
-    ),
-    Product(
-      id: 'p4',
-      title: 'Pan',
-      description: 'Frying pan',
-      price: 69.99,
-      imageUrl:
-          'https://m.media-amazon.com/images/I/819hzZIFNuL._AC_SL1500_.jpg',
-    ),
+    // Product(
+    //   id: 'p1',
+    //   title: 'Red Shirt',
+    //   description: 'A red shirt - it is pretty red!',
+    //   price: 29.99,
+    //   imageUrl:
+    //       'https://cdn.pixabay.com/photo/2016/10/02/22/17/red-t-shirt-1710578_1280.jpg',
+    // ),
+    // Product(
+    //   id: 'p2',
+    //   title: 'Trousers',
+    //   description: 'A nice pair of trousers.',
+    //   price: 59.99,
+    //   imageUrl:
+    //       'https://images.sportsdirect.com/images/products/36206203_l.jpg',
+    // ),
+    // Product(
+    //   id: 'p3',
+    //   title: 'Blanket',
+    //   description: 'My favorite blanket',
+    //   price: 99.99,
+    //   imageUrl:
+    //       'https://m.media-amazon.com/images/I/71THWcYwDML._AC_SL1500_.jpg',
+    // ),
+    // Product(
+    //   id: 'p4',
+    //   title: 'Pan',
+    //   description: 'Frying pan',
+    //   price: 69.99,
+    //   imageUrl:
+    //       'https://m.media-amazon.com/images/I/819hzZIFNuL._AC_SL1500_.jpg',
+    // ),
   ];
 
   // var _showFavoritesOnly = false;
@@ -88,7 +88,7 @@ class Products with ChangeNotifier {
   Future<void> addProduct(Product product) async {
     //Gửi HTTP Requests đến Server để lưu giữ liệu lên server
     const url =
-        'https://learn-flutter-shop-app-7cbf5-default-rtdb.firebaseio.com/';
+        'https://learn-flutter-shop-app-7cbf5-default-rtdb.firebaseio.com/products.json';
     /* Link đến Server: thêm cái /products.json để kiểu tạo 1 table Products
     (chỉ có Firebase mới làm đc tn thôi) */
 
@@ -104,7 +104,7 @@ class Products with ChangeNotifier {
         body: json.encode({
           'title': product.title,
           'description': product.description,
-          'imagUrl': product.imageUrl,
+          'imageUrl': product.imageUrl,
           'price': product.price,
           'isFavorite': product.isFavorite,
         }),
@@ -158,5 +158,38 @@ class Products with ChangeNotifier {
     _items.removeWhere((prod) => prod.id == id);
 
     notifyListeners();
+  }
+
+  /* Lấy list Product từ Web Server */
+  Future<void> fetchAndSetProducts() async {
+    const url =
+        'https://learn-flutter-shop-app-7cbf5-default-rtdb.firebaseio.com/products.json';
+    //Dùng get request để lấy data
+    try {
+      final response = await http.get(Uri.parse(url));
+      //Decode data từ JSON sang Map rồi sang List Product
+      final extractedData = json.decode(response.body) as Map<String, dynamic>;
+      //list chứa các product lấy về
+      final List<Product> loadedProducts = [];
+      //decode
+      extractedData.forEach((prodId, prodData) {
+        loadedProducts.add(Product(
+          id: prodId,
+          title: prodData['title'],
+          description: prodData['description'],
+          price: prodData['price'],
+          imageUrl: prodData['imageUrl'],
+          isFavorite: prodData['isFavorite'],
+        ));
+      });
+      //gán vào item
+      _items = loadedProducts;
+
+      notifyListeners();
+    } catch (error) {
+      //nếu có lỗi thì tung ra để xử lý ở Widget
+      rethrow;
+      //dùng rethrow để tung ra lại lỗi đã catch đc
+    }
   }
 }
