@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 //import cái này để gửi http request
 import 'package:http/http.dart' as http;
 
+import '../models/http_exception.dart';
 import 'product.dart';
 
 //Class chứa data cho Data Provider phải mix-in với ChangeNotifier
@@ -176,7 +177,7 @@ class Products with ChangeNotifier {
   }
 
   //Delete
-  void deleteProduct(String id) {
+  Future<void> deleteProduct(String id) async {
     /* Delete trên Server: cũng phải truyền vào ID */
     final url =
         'https://learn-flutter-shop-app-7cbf5-default-rtdb.firebaseio.com/products/$id.json';
@@ -190,21 +191,21 @@ class Products with ChangeNotifier {
     notifyListeners();
 
     //Xóa ở Server
-    http.delete(Uri.parse(url)).then((response) {
-      /*Nếu xóa đc thì xóa cái item tạm thời đi (nhưng sẽ lỗi khi gán với null,
-      kệ cx đc vì Dart có garbage collector mà)*/
-      //existingProduct = null;
+    final response = await http.delete(Uri.parse(url));
 
-      /* Riêng delete() thì kể cả nếu có lỗi nó cx ko return về -> mình phải 
+    /* Riêng delete() thì kể cả nếu có lỗi nó cx ko return về -> mình phải 
       tự throw ra:
         Xem xét status code của response: nếu là từ 400 trở đi thì là lỗi
-        -> throw*/
-      if (response.statusCode >= 400) {}
-    }).catchError((_) {
+        -> throw ra Exception
+        ( ko nên throw ra Exception() mà nên tự build 1 Class exception dựa trên
+        Exception() )*/
+    if (response.statusCode >= 400) {
       //Nếu xảy ra lỗi -> ko xóa đc -> roll back (insert lại item vào)
       _items.insert(existingProductIndex, existingProduct);
       notifyListeners();
-    });
+      //throw ra error để xử lý ở Widget
+      throw HttpException('Could not delete product.');
+    }
   }
 
   /* Lấy list Product từ Web Server */

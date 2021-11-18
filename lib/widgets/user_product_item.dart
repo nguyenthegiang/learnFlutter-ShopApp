@@ -15,6 +15,9 @@ class UserProductItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    //tạo biến này để truy cập ở chỗ delete
+    final scaffold = Scaffold.of(context);
+
     return ListTile(
       title: Text(title),
       leading: CircleAvatar(
@@ -43,9 +46,25 @@ class UserProductItem extends StatelessWidget {
             ),
             //Delete
             IconButton(
-              onPressed: () {
-                //Delete Product thông qua Provider
-                Provider.of<Products>(context, listen: false).deleteProduct(id);
+              onPressed: () async {
+                //chuyển thành async vì deleteProduct là async
+                //cho vào try catch vì deleteProduct() có thể throw lỗi
+                try {
+                  //Delete Product thông qua Provider
+                  await Provider.of<Products>(context, listen: false)
+                      .deleteProduct(id);
+                } catch (error) {
+                  //nếu lỗi (ko xóa đc) thì hiển thị thông báo
+                  /* thay vì viết thẳng Scaffold.of(context) thì mình phải dùng
+                  thông qua biến vì đang ở trong Future (async) mà context
+                  ở trong Future thì nó sẽ bị lỗi */
+                  scaffold.showSnackBar(SnackBar(
+                    content: Text(
+                      'Deleting Failed!',
+                      textAlign: TextAlign.center,
+                    ),
+                  ));
+                }
               },
               icon: const Icon(Icons.delete),
               color: Theme.of(context).errorColor,
