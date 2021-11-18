@@ -193,7 +193,8 @@ class Products with ChangeNotifier {
     //Xóa ở Server
     final response = await http.delete(Uri.parse(url));
 
-    /* Riêng delete() thì kể cả nếu có lỗi nó cx ko return về -> mình phải 
+    /* HTTP chỉ throw về Error với GET và POST, còn PATCH, PUT, DELETE thì kể cả 
+    nếu có lỗi nó cx ko return về -> mình phải 
       tự throw ra:
         Xem xét status code của response: nếu là từ 400 trở đi thì là lỗi
         -> throw ra Exception
