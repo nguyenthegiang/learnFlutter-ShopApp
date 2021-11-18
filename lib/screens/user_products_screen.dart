@@ -10,6 +10,16 @@ import '../screens/edit_product_screen.dart';
 class UserProductsScreen extends StatelessWidget {
   static const routeName = '/user-products';
 
+  //function để refresh lại list product, phải truyền vào context để dùng
+  Future<void> _refreshProducts(BuildContext context) async {
+    //Dùng async - await để khi nào fetch data xong mới return
+    await Provider.of<Products>(
+      context,
+      listen: false,
+      /* My customization: phải thêm listen: false nếu không sẽ lỗi */
+    ).fetchAndSetProducts();
+  }
+
   @override
   Widget build(BuildContext context) {
     //Set up Listener -> Product Provider
@@ -30,20 +40,24 @@ class UserProductsScreen extends StatelessWidget {
       ),
       //1 cái app drawer như các màn hình
       drawer: const AppDrawer(),
-      body: Padding(
-        padding: const EdgeInsets.all(8),
-        //Hiển thị List Product
-        child: ListView.builder(
-          itemCount: productsData.items.length,
-          itemBuilder: (_, i) => Column(
-            children: [
-              UserProductItem(
-                productsData.items[i].id,
-                productsData.items[i].title,
-                productsData.items[i].imageUrl,
-              ),
-              const Divider(),
-            ],
+      //Tạo cái RefreshIndicator để có tính năng Pull-to-refresh
+      body: RefreshIndicator(
+        onRefresh: () => _refreshProducts(context),
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          //Hiển thị List Product
+          child: ListView.builder(
+            itemCount: productsData.items.length,
+            itemBuilder: (_, i) => Column(
+              children: [
+                UserProductItem(
+                  productsData.items[i].id,
+                  productsData.items[i].title,
+                  productsData.items[i].imageUrl,
+                ),
+                const Divider(),
+              ],
+            ),
           ),
         ),
       ),
