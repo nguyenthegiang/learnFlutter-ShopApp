@@ -119,7 +119,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
   }
 
   //Method để Submit Form
-  void _saveForm() {
+  Future<void> _saveForm() async {
     /* Trước khi save form thì validate -> gọi đến validate() của Form
     -> nó sẽ gọi đến các function validator của TextFormField
     -> validate() sẽ trả về true nếu tất cả các validator đều thỏa mãn,
@@ -165,9 +165,10 @@ class _EditProductScreenState extends State<EditProductScreen> {
       -> chỉ khi nào đoạn code trong Future chạy xong mới quay trở về trang trc
       -> cho Navigator.of(context).pop(); vào trong then();
         Bên cạnh đó thì trong lúc đợi Future load xong thì hiển thị hình loading */
-      Provider.of<Products>(context, listen: false)
-          .addProduct(_editedProduct)
-          .catchError((error) {
+      try {
+        await Provider.of<Products>(context, listen: false)
+            .addProduct(_editedProduct);
+      } catch (error) {
         /* catchError ở đây sẽ bắt bất cứ error nào tung ra ở trong addProduct()
         ở đây thì mình đang ở trong Widget -> có thể xử lý Error: hiển thị lên
         để thông báo cho User;
@@ -182,7 +183,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
         mới quay về trang trc -> return về showDialog(), mà showDialog cũng 
         return về Future -> không sao cả, mà, showDialog() chỉ return khi người
         dùng đóng Dialog -> thỏa mãn điều kiện*/
-        return showDialog<Null>(
+        await showDialog<Null>(
           context: context,
           builder: (ctx) => AlertDialog(
             title: Text('An error occurred!'),
@@ -198,8 +199,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
             ],
           ),
         );
-        /*  */
-      }).then((_) {
+      } finally {
         /*Chuyển loading lại thành false vì đã load xong r 
         -> kết thúc hiển thị màn hình load*/
         setState(() {
@@ -208,7 +208,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
         //Tự động rời Page -> về page trc
         Navigator.of(context).pop();
-      });
+      }
     }
 
     //Navigator.of(context).pop();

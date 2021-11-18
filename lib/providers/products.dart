@@ -85,10 +85,10 @@ class Products with ChangeNotifier {
   //Add 1 product vào List, dùng trong edit_product_screen
   /* Cho function này return về Future, để phía bên UI mình có thể code để
   đợi send http requests xong */
-  Future<void> addProduct(Product product) {
+  Future<void> addProduct(Product product) async {
     //Gửi HTTP Requests đến Server để lưu giữ liệu lên server
     const url =
-        'https://learn-flutter-shop-app-7cbf5-default-rtdb.firebaseio.com/products.json';
+        'https://learn-flutter-shop-app-7cbf5-default-rtdb.firebaseio.com/';
     /* Link đến Server: thêm cái /products.json để kiểu tạo 1 table Products
     (chỉ có Firebase mới làm đc tn thôi) */
 
@@ -98,17 +98,17 @@ class Products with ChangeNotifier {
         - Nếu return trong then() thì nó lại sai vì phải return ở bên ngoài
       -> return về cả khối http.post().then()... này luôn, vì then() cx return
       về future mà*/
-    return http
-        .post(
-      Uri.parse(url),
-      body: json.encode({
-        'title': product.title,
-        'description': product.description,
-        'imagUrl': product.imageUrl,
-        'price': product.price,
-        'isFavorite': product.isFavorite,
-      }),
-      /* Dùng package http để gửi 1 Post request đến url đó;
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        body: json.encode({
+          'title': product.title,
+          'description': product.description,
+          'imagUrl': product.imageUrl,
+          'price': product.price,
+          'isFavorite': product.isFavorite,
+        }),
+        /* Dùng package http để gửi 1 Post request đến url đó;
       1 số argument: 
         - url: (version mới của package http) chỉ chấp nhận object Uri thôi
               -> phải parse
@@ -116,9 +116,8 @@ class Products with ChangeNotifier {
         - body: phải truyền vào JSON data:
           + import dart:convert để convert data sang JSON 
           + tạo map và convert nó sang JSON*/
-    )
-        /* Gọi then() để có thể thao tác với response và Server trả về */
-        .then((response) {
+      );
+      /* Gọi then() để có thể thao tác với response và Server trả về */
       final newProduct = Product(
         id: json.decode(response.body)['name'],
         /*id lấy từ ID và Server gen ra
@@ -132,19 +131,11 @@ class Products with ChangeNotifier {
       _items.add(newProduct);
 
       notifyListeners();
-      /*Khi này phải đợi 1 lúc thì Flutter App mới reload đc vì phải đợi 
-      gửi request và server response*/
-    }).catchError((error) {
-      /* error handling ở đây -> nếu xảy ra lỗi gì ở mấy function trên kia
-      thì chạy function này (khi send http request thì có thể có rất nhiều
-      loại lỗi xảy ra, phải cẩn thận) */
+    } catch (error) {
       print(error); //print error ra
-      /* Làm gì cx đc, quan trọng là có catch Error thì App nó sẽ ko Crash nữa*/
 
       throw (error); //lại throw error ra
-      /* catch r lại throw ra vì mình muốn catch ở chỗ khác nữa 
-      (ở bên ngoài edit_product_screen) */
-    });
+    }
   }
 
   //Function update Product vào Provider, dùng khi Edit ở edit product screen
