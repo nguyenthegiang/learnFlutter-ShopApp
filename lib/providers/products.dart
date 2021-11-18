@@ -177,9 +177,34 @@ class Products with ChangeNotifier {
 
   //Delete
   void deleteProduct(String id) {
-    _items.removeWhere((prod) => prod.id == id);
+    /* Delete trên Server: cũng phải truyền vào ID */
+    final url =
+        'https://learn-flutter-shop-app-7cbf5-default-rtdb.firebaseio.com/products/$id.json';
 
+    //Lưu trữ lại item sẽ xóa vào 1 Object tạm thời để có thể rollback
+    final existingProductIndex = _items.indexWhere((prod) => prod.id == id);
+    var existingProduct = _items[existingProductIndex];
+
+    //Xóa ở Local
+    _items.removeAt(existingProductIndex);
     notifyListeners();
+
+    //Xóa ở Server
+    http.delete(Uri.parse(url)).then((response) {
+      /*Nếu xóa đc thì xóa cái item tạm thời đi (nhưng sẽ lỗi khi gán với null,
+      kệ cx đc vì Dart có garbage collector mà)*/
+      //existingProduct = null;
+
+      /* Riêng delete() thì kể cả nếu có lỗi nó cx ko return về -> mình phải 
+      tự throw ra:
+        Xem xét status code của response: nếu là từ 400 trở đi thì là lỗi
+        -> throw*/
+      if (response.statusCode >= 400) {}
+    }).catchError((_) {
+      //Nếu xảy ra lỗi -> ko xóa đc -> roll back (insert lại item vào)
+      _items.insert(existingProductIndex, existingProduct);
+      notifyListeners();
+    });
   }
 
   /* Lấy list Product từ Web Server */
