@@ -1,6 +1,9 @@
 // ignore_for_file: file_names
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+
 import '../providers/cart.dart';
 
 //Chứa 1 sản phẩm trong Order
@@ -28,16 +31,49 @@ class Orders with ChangeNotifier {
   }
 
   //Thêm 1 Order từ Cart vào: dùng cho nút ORDER NOW
-  void addOrder(List<CartItem> cartProducts, double total) {
+  /* Add Order lên Server: tương tự như Add Product */
+  Future<void> addOrder(List<CartItem> cartProducts, double total) async {
+    //Lưu vào Table Orders
+    const url =
+        'https://learn-flutter-shop-app-7cbf5-default-rtdb.firebaseio.com/orders.json';
+
+    /*Mình cần dùng DateTime.now() ở 2 chỗ là gửi lên server và store vào local
+    => tạo 1 biến lưu trữ trc để nó đồng bộ, nếu ko 2 lần gọi DateTime.now() có 
+    thể tạo ra 2 giá trị khác nhau*/
+    final timestamp = DateTime.now();
+
+    //Có thể thêm error handling ở đây cho đầy đủ
+    final response = await http.post(
+      Uri.parse(url),
+      body: json.encode({
+        'amount': total,
+        'dateTime': timestamp.toIso8601String(),
+        /*Iso8601String: là 1 uniform String representation of dates, sau này
+        có thể dễ dàng convert về DateTime object */
+        'products': cartProducts
+            .map((cp) => {
+                  'id': cp.id,
+                  'title': cp.title,
+                  'quantity': cp.quantity,
+                  'price': cp.price,
+                })
+            .toList(),
+        /* Product là 1 List CartItem -> phải convert sang 1 list các Map
+        (mà sau đó khi endcode() sẽ convert cái list đó thành Map nốt luôn) */
+      }),
+    );
+
     /*dùng insert() để thêm vào 1 vị trí nhất định: đầu tiên 
       -> order mới nhất sẽ xuất hiện đầu*/
     _orders.insert(
       0,
       OrderItem(
-        id: DateTime.now().toString(),
+        /*Lấy ID từ cái id đc Firebase generate (khi add xong server sẽ gửi 1 
+        response là item đc add vào)*/
+        id: json.decode(response.body)['name'],
         amount: total,
         products: cartProducts,
-        dateTime: DateTime.now(),
+        dateTime: timestamp,
       ),
     );
 

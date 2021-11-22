@@ -57,21 +57,7 @@ class CartScreen extends StatelessWidget {
                   ),
                   /* FlatButton deprecated rồi nên mình chuyển sang TextButton
                   làm theo migration guide */
-                  TextButton(
-                    child: const Text('ORDER NOW'),
-                    onPressed: () {
-                      //ấn nút này thì add cart vào Order
-                      Provider.of<Orders>(context, listen: false).addOrder(
-                        cart.items.values.toList(),
-                        cart.totalAmount,
-                      );
-                      //Add Cart vào Order rồi thì clear cái Cart này đi thôi
-                      cart.clear();
-                    },
-                    style: TextButton.styleFrom(
-                      primary: Theme.of(context).colorScheme.primary,
-                    ),
-                  ),
+                  OrderButton(cart: cart),
                 ],
               ),
             ),
@@ -93,6 +79,60 @@ class CartScreen extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/* Extract cái này ra làm Widget riêng vì nó có thay đổi -> cần phải là 
+StatefulWidget (còn nếu chuyển cả cái Widget to trên kia làm Stateful thì nó
+phải rebuild thừa mỗi lần cái này thay đổi -> Performace) */
+class OrderButton extends StatefulWidget {
+  const OrderButton({
+    Key? key,
+    required this.cart,
+  }) : super(key: key);
+
+  final Cart cart;
+
+  @override
+  State<OrderButton> createState() => _OrderButtonState();
+}
+
+class _OrderButtonState extends State<OrderButton> {
+  var _isLoading = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton(
+      child: _isLoading ? CircularProgressIndicator() : Text('ORDER NOW'),
+      /* Nếu ko có Cart nào thì disable nút này = cách để
+      onPressed = null */
+      onPressed: (widget.cart.totalAmount <= 0 || _isLoading)
+          ? null
+          : () async {
+              /* Nếu đang load (đang gửi http request) thì cx disable button 
+              và hiển thị loading spinner nữa*/
+              setState(() {
+                _isLoading = true;
+              });
+
+              //ấn nút này thì add cart vào Order
+              await Provider.of<Orders>(context, listen: false).addOrder(
+                widget.cart.items.values.toList(),
+                widget.cart.totalAmount,
+              );
+
+              //trở lại bình thg
+              setState(() {
+                _isLoading = false;
+              });
+
+              //Add Cart vào Order rồi thì clear cái Cart này đi thôi
+              widget.cart.clear();
+            },
+      style: TextButton.styleFrom(
+        primary: Theme.of(context).colorScheme.primary,
       ),
     );
   }
