@@ -217,7 +217,15 @@ class Products with ChangeNotifier {
     try {
       final response = await http.get(Uri.parse(url));
       //Decode data từ JSON sang Map rồi sang List Product
-      final extractedData = json.decode(response.body) as Map<String, dynamic>;
+      //có thể null nếu server ko có dữ liệu
+      final Map<String, dynamic>? extractedData =
+          json.decode(response.body) as Map<String, dynamic>?;
+
+      //null thì return luôn
+      if (extractedData == null) {
+        return;
+      }
+
       //list chứa các product lấy về
       final List<Product> loadedProducts = [];
       //decode

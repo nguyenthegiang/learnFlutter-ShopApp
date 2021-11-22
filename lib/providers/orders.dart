@@ -79,4 +79,48 @@ class Orders with ChangeNotifier {
 
     notifyListeners();
   }
+
+  /* Lấy list Order từ Server xuống để hiển thị (như Product thôi)*/
+  Future<void> fetchAndSetOrders() async {
+    const url =
+        'https://learn-flutter-shop-app-7cbf5-default-rtdb.firebaseio.com/orders.json';
+
+    final response = await http.get(Uri.parse(url));
+
+    final List<OrderItem> loadedOrders = [];
+
+    //extractedData có thể null nếu ko có dữ liệu trên server
+    final Map<String, dynamic>? extractedData =
+        json.decode(response.body) as Map<String, dynamic>?;
+
+    //nếu null thì khỏi add vào list ở local làm gì, đỡ lỗi
+    if (extractedData == null) {
+      return;
+    }
+
+    //Lấy ra list orders
+    extractedData.forEach((orderId, orderData) {
+      loadedOrders.add(OrderItem(
+        id: orderId,
+        amount: orderData['amount'],
+        dateTime: DateTime.parse(orderData['dateTime']),
+        products: (orderData['products'] as List<dynamic>)
+            .map(
+              (item) => CartItem(
+                id: item['id'],
+                title: item['title'],
+                quantity: item['quantity'],
+                price: item['price'],
+              ),
+            )
+            .toList(),
+      ));
+    });
+
+    //gán vào list order ở local
+    _orders = loadedOrders.reversed.toList();
+    //sắp xếp lại thứ tự cho đúng
+
+    notifyListeners();
+  }
 }

@@ -6,8 +6,34 @@ import '../widgets/app_drawer.dart';
 import '../widgets/order_item.dart';
 
 //màn hình hiển thị các order
-class OrdersScreen extends StatelessWidget {
+class OrdersScreen extends StatefulWidget {
   static const routeName = '/orders';
+
+  @override
+  State<OrdersScreen> createState() => _OrdersScreenState();
+}
+
+class _OrdersScreenState extends State<OrdersScreen> {
+  //để hiển thị loading spinner lúc lấy data từ server
+  var _isLoading = false;
+
+  /* Dùng initState() với Future.delayed hack để lấy list Orders từ Server và
+  hiển thị */
+  @override
+  void initState() {
+    Future.delayed(Duration.zero).then((_) async {
+      setState(() {
+        _isLoading = true;
+      });
+
+      await Provider.of<Orders>(context, listen: false).fetchAndSetOrders();
+
+      setState(() {
+        _isLoading = false;
+      });
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,10 +47,14 @@ class OrdersScreen extends StatelessWidget {
       ),
       //Drawer: cái menu từ phía bên trái
       drawer: AppDrawer(),
-      body: ListView.builder(
-        itemCount: orderData.orders.length,
-        itemBuilder: (ctx, i) => OrderItem(orderData.orders[i]),
-      ),
+      body: _isLoading
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : ListView.builder(
+              itemCount: orderData.orders.length,
+              itemBuilder: (ctx, i) => OrderItem(orderData.orders[i]),
+            ),
     );
   }
 }
