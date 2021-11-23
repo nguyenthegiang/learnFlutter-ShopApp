@@ -12,6 +12,7 @@ import './providers/cart.dart';
 import './screens/user_products_screen.dart';
 import './screens/edit_product_screen.dart';
 import './screens/auth_screen.dart';
+import './providers/auth.dart';
 
 void main() => runApp(MyApp());
 
@@ -46,6 +47,10 @@ class MyApp extends StatelessWidget {
         /* Tạo Provider cho Order */
         ChangeNotifierProvider(
           create: (ctx) => Orders(),
+        ),
+        /* Provider cho auth */
+        ChangeNotifierProvider(
+          create: (ctx) => Auth(),
         ),
       ],
       //child : nó sẽ Listen cho tất cả các Provider trong list trên kia
