@@ -4,6 +4,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
+import '../models/http_exception.dart';
+
 class Auth with ChangeNotifier {
   // String _token;
   // DateTime _expiryDate;
@@ -32,15 +34,33 @@ class Auth with ChangeNotifier {
     final url =
         'https://identitytoolkit.googleapis.com/v1/accounts:$urlSegment?key=AIzaSyCIRTI838p6SbMXCKEn1tvi-auxPBL-3eQ';
     //URL gắn vs URL truyền vào
-    final response = await http.post(
-      Uri.parse(url),
-      body: json.encode({
-        'email': email,
-        'password': password,
-        'returnSecureToken': true,
-      }),
-    );
 
-    print(json.decode(response.body));
+    //cho vào try catch để nếu có lỗi gì thì xử lý
+    try {
+      final response = await http.post(
+        Uri.parse(url),
+        body: json.encode({
+          'email': email,
+          'password': password,
+          'returnSecureToken': true,
+        }),
+      );
+
+      /* (nếu là server API khác thì có thể truyền về error code -> http.post()
+      sẽ throw ra error) nhưng Firebase luôn trả về code 200, kế cả có lỗi, và
+      lỗi thì ở trong message thôi -> mình phải tự check message xem có lỗi thì
+      throw ra*/
+      final responseData = json.decode(response.body);
+      if (responseData['error'] != null) {
+        /*nếu có key 'error' trong Map (khi có lỗi sẽ có) thì throw ra cái 
+        exception mà mình tạo ra*/
+        throw HttpException(responseData['error']['message']);
+        //throw ra cái message của Firebase -> xử lý bên auth_screen
+      }
+    } catch (error) {
+      rethrow;
+    }
+
+    //print(json.decode(response.body));
   }
 }

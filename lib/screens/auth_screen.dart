@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/auth.dart';
+import '../models/http_exception.dart';
 
 //2 mode để hiện thị UI khác nhau
 enum AuthMode { Signup, Login }
@@ -107,6 +108,26 @@ class _AuthCardState extends State<AuthCard> {
   var _isLoading = false;
   final _passwordController = TextEditingController();
 
+  //function để show cái error message nếu có khi login / signup
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('An Error Occurred!'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(ctx).pop();
+              //ấn nút này thì đóng dialog
+            },
+            child: Text('Okay'),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) {
       // Invalid!
@@ -116,19 +137,50 @@ class _AuthCardState extends State<AuthCard> {
     setState(() {
       _isLoading = true;
     });
-    if (_authMode == AuthMode.Login) {
-      // Log user in
-      await Provider.of<Auth>(context, listen: false).login(
-        _authData['email'] as String,
-        _authData['password'] as String,
-      );
-    } else {
-      // Sign user up
-      await Provider.of<Auth>(context, listen: false).signup(
-        _authData['email'] as String,
-        _authData['password'] as String,
-      );
+
+    //Cho vào try vì authenticate() của auth.dart có thể throw lỗi
+    try {
+      if (_authMode == AuthMode.Login) {
+        // Log user in
+        await Provider.of<Auth>(context, listen: false).login(
+          _authData['email'] as String,
+          _authData['password'] as String,
+        );
+      } else {
+        // Sign user up
+        await Provider.of<Auth>(context, listen: false).signup(
+          _authData['email'] as String,
+          _authData['password'] as String,
+        );
+      }
+    } on HttpException catch (error) {
+      //nếu là HttpException -> lỗi server -> xử lý riêng
+
+      var errorMessage = 'Authentication failed'; //default message
+
+      /*xử lý tùy thuộc vào message của error, message có thể dài -> chỉ tìm
+      xem nó có contains mấy cái keyword ko thôi*/
+      if (error.toString().contains('EMAIL_EXISTS')) {
+        errorMessage = 'This email addess is already in use.';
+      } else if (error.toString().contains('INVALID_EMAIL')) {
+        errorMessage = 'This is not a valid email address';
+      } else if (error.toString().contains('WEAK_PASSWORD')) {
+        errorMessage = 'This password is too weak.';
+      } else if (error.toString().contains('EMAIL_NOT_FOUND')) {
+        errorMessage = 'Could not find a user with that email.';
+      } else if (error.toString().contains('INVALID_PASSWORD')) {
+        errorMessage = 'Invalid Password.';
+      }
+
+      _showErrorDialog(errorMessage);
+    } catch (error) {
+      //còn nếu lỗi khác thì thôi, xử lý chung 1 kiểu (VD như mất kết nối internet)
+      const errorMessage =
+          'Could not authenticate you. Please try again later.';
+
+      _showErrorDialog(errorMessage);
     }
+
     setState(() {
       _isLoading = false;
     });
