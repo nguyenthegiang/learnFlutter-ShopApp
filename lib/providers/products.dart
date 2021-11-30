@@ -95,8 +95,8 @@ class Products with ChangeNotifier {
   đợi send http requests xong */
   Future<void> addProduct(Product product) async {
     //Gửi HTTP Requests đến Server để lưu giữ liệu lên server
-    const url =
-        'https://learn-flutter-shop-app-7cbf5-default-rtdb.firebaseio.com/products.json';
+    final url =
+        'https://learn-flutter-shop-app-7cbf5-default-rtdb.firebaseio.com/products.json?auth=$authToken';
     /* Link đến Server: thêm cái /products.json để kiểu tạo 1 table Products
     (chỉ có Firebase mới làm đc tn thôi) */
 
@@ -158,7 +158,7 @@ class Products with ChangeNotifier {
        (tương tự như cấu trúc folder trên server thôi)
        (vì id là truyền vào nên url ko thể là const)*/
       final url =
-          'https://learn-flutter-shop-app-7cbf5-default-rtdb.firebaseio.com/products/$id.json';
+          'https://learn-flutter-shop-app-7cbf5-default-rtdb.firebaseio.com/products/$id.json?auth=$authToken';
 
       /* Gửi PATCH request để update -> bảo Firebase merge cái data (có id kia)
       với cái data truyền đến này 
@@ -187,7 +187,7 @@ class Products with ChangeNotifier {
   Future<void> deleteProduct(String id) async {
     /* Delete trên Server: cũng phải truyền vào ID */
     final url =
-        'https://learn-flutter-shop-app-7cbf5-default-rtdb.firebaseio.com/products/$id.json';
+        'https://learn-flutter-shop-app-7cbf5-default-rtdb.firebaseio.com/products/$id.json?auth=$authToken';
 
     //Lưu trữ lại item sẽ xóa vào 1 Object tạm thời để có thể rollback
     final existingProductIndex = _items.indexWhere((prod) => prod.id == id);

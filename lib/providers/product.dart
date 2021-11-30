@@ -25,7 +25,8 @@ class Product with ChangeNotifier {
   });
 
   //Tạo function thay đổi giá trị của isFavorite
-  Future<void> toggleFavoriteStatus() async {
+  /* nhận vào authToken để gửi request */
+  Future<void> toggleFavoriteStatus(String token) async {
     //giữ value cũ để có thể roll back (cho Optimistic Update)
     final oldStatus = isFavorite;
 
@@ -38,7 +39,7 @@ class Product with ChangeNotifier {
     /* Update trên Server (Optimistic Update: thay đổi ở local đã r mới thay đổi
     trên Server) */
     final url =
-        'https://learn-flutter-shop-app-7cbf5-default-rtdb.firebaseio.com/products/$id.json';
+        'https://learn-flutter-shop-app-7cbf5-default-rtdb.firebaseio.com/products/$id.json?auth=$token';
     try {
       final response = await http.patch(
         Uri.parse(url),

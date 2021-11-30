@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../providers/cart.dart';
 import '../screens/product_detail_screen.dart';
 import '../providers/product.dart';
+import '../providers/auth.dart';
 
 class ProductItem extends StatelessWidget {
   // final String id;
@@ -21,6 +22,8 @@ class ProductItem extends StatelessWidget {
 
     //sử dụng Cart Provider
     final cart = Provider.of<Cart>(context, listen: false);
+
+    final authData = Provider.of<Auth>(context, listen: false);
 
     /*1 cách khác để làm Listener: lấy dữ liệu từ Data Provider; khả năng y hệt 
     như Provider.of -> Đó là Consumer:
@@ -56,7 +59,10 @@ class ProductItem extends StatelessWidget {
               onPressed: () {
                 /*Khi nhấn vào nút Favorite thì gọi đến toggleFavoriteStatus()
                 để thực hiện thay đổi giá trị của isFavorite*/
-                product.toggleFavoriteStatus();
+
+                //truyền token vào để nó thực hiện request đến server
+                product.toggleFavoriteStatus(authData.token as String);
+
                 /*Và toggleFavoriteStatus() sẽ gọi đến notifyListener() -> 
                 khiến cho Widget này rebuild -> thay đổi icon hiển thị tương ứng */
               },

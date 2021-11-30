@@ -24,6 +24,11 @@ class OrderItem {
 //Chứa danh sách OrderItem
 class Orders with ChangeNotifier {
   List<OrderItem> _orders = [];
+  //authToken để gửi requests đến server
+  final String authToken;
+
+  //constructor (như Products)
+  Orders(this.authToken, this._orders);
 
   //Getter
   List<OrderItem> get orders {
@@ -34,8 +39,8 @@ class Orders with ChangeNotifier {
   /* Add Order lên Server: tương tự như Add Product */
   Future<void> addOrder(List<CartItem> cartProducts, double total) async {
     //Lưu vào Table Orders
-    const url =
-        'https://learn-flutter-shop-app-7cbf5-default-rtdb.firebaseio.com/orders.json';
+    final url =
+        'https://learn-flutter-shop-app-7cbf5-default-rtdb.firebaseio.com/orders.json?auth=$authToken';
 
     /*Mình cần dùng DateTime.now() ở 2 chỗ là gửi lên server và store vào local
     => tạo 1 biến lưu trữ trc để nó đồng bộ, nếu ko 2 lần gọi DateTime.now() có 
@@ -82,8 +87,8 @@ class Orders with ChangeNotifier {
 
   /* Lấy list Order từ Server xuống để hiển thị (như Product thôi)*/
   Future<void> fetchAndSetOrders() async {
-    const url =
-        'https://learn-flutter-shop-app-7cbf5-default-rtdb.firebaseio.com/orders.json';
+    final url =
+        'https://learn-flutter-shop-app-7cbf5-default-rtdb.firebaseio.com/orders.json?auth=$authToken';
 
     final response = await http.get(Uri.parse(url));
 

@@ -76,8 +76,13 @@ class MyApp extends StatelessWidget {
           create: (ctx) => Cart(),
         ),
         /* Tạo Provider cho Order */
-        ChangeNotifierProvider(
-          create: (ctx) => Orders(),
+        ChangeNotifierProxyProvider<Auth, Orders>(
+          //tương tự như Products
+          create: (_) => Orders('', []),
+          update: (ctx, auth, previousOrders) => Orders(
+            auth.token as String,
+            previousOrders == null ? [] : previousOrders.orders,
+          ),
         ),
       ],
       //child : nó sẽ Listen cho tất cả các Provider trong list trên kia
