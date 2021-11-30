@@ -7,11 +7,30 @@ import 'package:http/http.dart' as http;
 import '../models/http_exception.dart';
 
 class Auth with ChangeNotifier {
-  // String _token;
-  // DateTime _expiryDate;
-  // /*token thường sẽ expire sau 1 khoảng thời gian (với Firebase là 1 tiếng)
-  // nên phải lưu lại thời gian expire*/
-  // String _userId;
+  String? _token;
+  DateTime? _expiryDate;
+  /*token thường sẽ expire sau 1 khoảng thời gian (với Firebase là 1 tiếng)
+  nên phải lưu lại thời gian expire*/
+  String? _userId;
+
+  /* Kiểm tra xem đã login chưa, dùng cho main.dart;
+  Rule: nếu có token và token chưa expire thì là login rồi */
+  bool get isAuth {
+    //nếu getter token ko null thì return true
+    return token != null;
+  }
+
+  //kiểm tra xem có token ko và token đó phải chưa expire
+  String? get token {
+    if (_expiryDate != null &&
+        _expiryDate!.isAfter(DateTime.now()) &&
+        _token != null) {
+      return _token;
+    }
+
+    //nếu ko có hoặc đã expire thì return null
+    return null;
+  }
 
   /*Sign up:
   Hướng dẫn: https://firebase.google.com/docs/reference/rest/auth#section-create-email-password */
@@ -57,6 +76,20 @@ class Auth with ChangeNotifier {
         throw HttpException(responseData['error']['message']);
         //throw ra cái message của Firebase -> xử lý bên auth_screen
       }
+
+      //set token và các thứ để check chuyển page sang home
+      _token = responseData['idToken'];
+      _userId = responseData['localId'];
+      //response chỉ có số giây (string) cho đến lúc expire thôi -> phải tự tính
+      _expiryDate = DateTime.now().add(
+        Duration(
+          seconds: int.parse(
+            responseData['expiresIn'],
+          ),
+        ),
+      );
+
+      notifyListeners();
     } catch (error) {
       rethrow;
     }

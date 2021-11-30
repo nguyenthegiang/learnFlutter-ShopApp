@@ -54,25 +54,30 @@ class MyApp extends StatelessWidget {
         ),
       ],
       //child : nó sẽ Listen cho tất cả các Provider trong list trên kia
-      child: MaterialApp(
-        title: 'MyShop',
-        /* My modification: accentColor bị deprecated rồi nên mình dùng
+      child: Consumer<Auth>(
+        /*Đặt consumer của Auth cho MaterialApp() -> mỗi khi có thay đổi trong
+        Auth() (login, logout, signup) thì MaterialApp() reload*/
+        builder: (ctx, auth, _) => MaterialApp(
+          title: 'MyShop',
+          /* My modification: accentColor bị deprecated rồi nên mình dùng
         colorScheme.secondary */
-        theme: ThemeData(
-          /* Muốn truy cập vào primaryColor: colorScheme.primary;
+          theme: ThemeData(
+            /* Muốn truy cập vào primaryColor: colorScheme.primary;
             Muốn truy cập vào accentColor: colorScheme.secondary; */
-          colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.purple)
-              .copyWith(secondary: Colors.deepOrange),
-          fontFamily: 'Lato',
+            colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.purple)
+                .copyWith(secondary: Colors.deepOrange),
+            fontFamily: 'Lato',
+          ),
+          /* Kiểm tra xem đã login chưa -> nếu rồi thì chuyển về Home */
+          home: auth.isAuth ? ProductsOverviewScreen() : AuthScreen(),
+          routes: {
+            ProductDetailScreen.routeName: (ctx) => ProductDetailScreen(),
+            CartScreen.routeName: (ctx) => CartScreen(),
+            OrdersScreen.routeName: (ctx) => OrdersScreen(),
+            UserProductsScreen.routeName: (ctx) => UserProductsScreen(),
+            EditProductScreen.routeName: (ctx) => EditProductScreen(),
+          },
         ),
-        home: AuthScreen(),
-        routes: {
-          ProductDetailScreen.routeName: (ctx) => ProductDetailScreen(),
-          CartScreen.routeName: (ctx) => CartScreen(),
-          OrdersScreen.routeName: (ctx) => OrdersScreen(),
-          UserProductsScreen.routeName: (ctx) => UserProductsScreen(),
-          EditProductScreen.routeName: (ctx) => EditProductScreen(),
-        },
       ),
     );
   }
