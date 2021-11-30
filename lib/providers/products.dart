@@ -12,10 +12,11 @@ import 'product.dart';
 class Products with ChangeNotifier {
   //String để lưu giữ Token khi Authentication
   final String authToken;
+  final String userId;
 
   /*nhận token qua constructor 
   (truyền vào trong main.dart ở Provider khi khởi tạo Object)*/
-  Products(this.authToken, this._items);
+  Products(this.authToken, this.userId, this._items);
 
   List<Product> _items = [
     // Product(
@@ -114,7 +115,6 @@ class Products with ChangeNotifier {
           'description': product.description,
           'imageUrl': product.imageUrl,
           'price': product.price,
-          'isFavorite': product.isFavorite,
         }),
         /* Dùng package http để gửi 1 Post request đến url đó;
       1 số argument: 
@@ -219,7 +219,7 @@ class Products with ChangeNotifier {
   /* Lấy list Product từ Web Server */
   Future<void> fetchAndSetProducts() async {
     //gắn token vào URL để lấy data sau khi đã authenticate
-    final url =
+    var url =
         'https://learn-flutter-shop-app-7cbf5-default-rtdb.firebaseio.com/products.json?auth=$authToken';
     //Dùng get request để lấy data
     try {
@@ -234,6 +234,14 @@ class Products with ChangeNotifier {
         return;
       }
 
+      //thêm 1 request nữa để lấy về isFavorite
+      url =
+          'https://learn-flutter-shop-app-7cbf5-default-rtdb.firebaseio.com/userFavorites/$userId.json?auth=$authToken';
+      final favoriteResponse = await http.get(
+        Uri.parse(url),
+      );
+      final favoriteData = json.decode(favoriteResponse.body);
+
       //list chứa các product lấy về
       final List<Product> loadedProducts = [];
       //decode
@@ -244,7 +252,10 @@ class Products with ChangeNotifier {
           description: prodData['description'],
           price: prodData['price'],
           imageUrl: prodData['imageUrl'],
-          isFavorite: prodData['isFavorite'],
+          isFavorite:
+              favoriteData == null ? false : favoriteData[prodId] ?? false,
+          /*nếu favoriteData null (ng dùng chưa có favorite nào) hoặc favoriteData 
+          của product này null thì đều nghĩa là ng dùng ko favorite product này*/
         ));
       });
       //gán vào item

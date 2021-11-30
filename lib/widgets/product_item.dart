@@ -60,8 +60,11 @@ class ProductItem extends StatelessWidget {
                 /*Khi nhấn vào nút Favorite thì gọi đến toggleFavoriteStatus()
                 để thực hiện thay đổi giá trị của isFavorite*/
 
-                //truyền token vào để nó thực hiện request đến server
-                product.toggleFavoriteStatus(authData.token as String);
+                //truyền token vào để nó thực hiện request đến server, và userId
+                product.toggleFavoriteStatus(
+                  authData.token as String,
+                  authData.userId as String,
+                );
 
                 /*Và toggleFavoriteStatus() sẽ gọi đến notifyListener() -> 
                 khiến cho Widget này rebuild -> thay đổi icon hiển thị tương ứng */

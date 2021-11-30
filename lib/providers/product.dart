@@ -25,8 +25,8 @@ class Product with ChangeNotifier {
   });
 
   //Tạo function thay đổi giá trị của isFavorite
-  /* nhận vào authToken để gửi request */
-  Future<void> toggleFavoriteStatus(String token) async {
+  /* nhận vào authToken để gửi request và userId*/
+  Future<void> toggleFavoriteStatus(String token, String userId) async {
     //giữ value cũ để có thể roll back (cho Optimistic Update)
     final oldStatus = isFavorite;
 
@@ -38,14 +38,19 @@ class Product with ChangeNotifier {
 
     /* Update trên Server (Optimistic Update: thay đổi ở local đã r mới thay đổi
     trên Server) */
+    /* Update Favorite riêng vs từng User: cho vào bảng userFavorites:
+      mỗi user sẽ có 1 thư mục riêng là userId của user đó, và trong đó sẽ có
+      các product và user đó favorite */
     final url =
-        'https://learn-flutter-shop-app-7cbf5-default-rtdb.firebaseio.com/products/$id.json?auth=$token';
+        'https://learn-flutter-shop-app-7cbf5-default-rtdb.firebaseio.com/userFavorites/$userId/$id.json?auth=$token';
     try {
-      final response = await http.patch(
+      /* với việc Favorite cho vào bảng riêng -> ko muốn dùng patch request để
+      thêm data vào mà muốn ghi đè data cũ -> dùng put request */
+      final response = await http.put(
         Uri.parse(url),
-        body: json.encode({
-          'isFavorite': isFavorite,
-        }),
+        body: json.encode(
+          isFavorite,
+        ),
       );
 
       //vì http ko return error với patch() nên mình phải tự kiểm tra và return

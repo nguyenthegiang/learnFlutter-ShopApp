@@ -32,6 +32,11 @@ class Auth with ChangeNotifier {
     return null;
   }
 
+  //getter cho userId (dùng khi add Favorite)
+  String? get userId {
+    return _userId;
+  }
+
   /*Sign up:
   Hướng dẫn: https://firebase.google.com/docs/reference/rest/auth#section-create-email-password */
   Future<void> signup(String email, String password) async {

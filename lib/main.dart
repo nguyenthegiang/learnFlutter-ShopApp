@@ -62,9 +62,10 @@ class MyApp extends StatelessWidget {
             
             bên cạnh đó: create nữa (video bị thiếu cái này)*/
 
-          create: (_) => Products('', []),
+          create: (_) => Products('', '', []),
           update: (ctx, auth, previousProducts) => Products(
             auth.token as String,
+            auth.userId as String,
             /* ở đây mình phải update để giữ lại List Product
             nhưng ở lần khởi chạy đầu tiên thì list null -> phải check null,
             nếu null thì return về list rỗng thôi */
