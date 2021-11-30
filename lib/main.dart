@@ -22,6 +22,11 @@ class MyApp extends StatelessWidget {
     /* Dùng MultiProvider để có thể sử dụng nhiều Provider cho 1 child */
     return MultiProvider(
       providers: [
+        /* Provider cho auth */
+        ChangeNotifierProvider(
+          create: (ctx) => Auth(),
+        ),
+
         /* Wrap MaterialApp với Widget này để biến providers/products.dart trở thành
         1 Provider, và tạo 1 Data Container ở đây -> Khi Data Container thay đổi, 
         những child của nó mà listen cái data container này sẽ đc rebuild
@@ -31,14 +36,40 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider cho đỡ thừa cái context, nhưng Data ở đây là 1 
         Object mà khi truyền vào mới đc khởi tạo -> nên dùng ChangeNotifierProvider
         thì nó hợp lý hơn và tránh bug */
-        ChangeNotifierProvider(
+
+        /* Dùng ChangeNotifierProxyProvider thay vì ChangeNotifierProvider để có
+        thể làm cho cái Provider này phụ thuộc vào 1 Provider khác (Products phụ
+        thuộc vào Auth), từ đó -> mỗi khi Provider Auth thay đổi thì Provider 
+        Products Reload -> lấy đc những property trong Auth (mình cần lấy 
+        Token để cho vào URL khi thực hiện Request)
+        - Để thực hiện đc điều này thì Provider Auth cần phải khai báo trc (ở trên)
+        - trong < > sẽ là 2 class: Auth là Provider mà mình muốn phụ thuộc, Products
+        là class mình muốn return về của Provider này */
+        ChangeNotifierProxyProvider<Auth, Products>(
           /*Phải có argument này: 
             - Với provider package version <= 3.0 : builder
             - Với version >= 4.0 : create   (chỉ khác tên thôi)
           argument này nhận 1 function: nhận về context và trả về 1 đối tượng của 
           Provider Class -> các child có thể tạo Listener để listen cùng 1 cái đối 
           tượng này*/
-          create: (ctx) => Products(),
+
+          /* version >= 4.0 : update
+          truyền vào 3 argument:
+            - context
+            - Object của Provider Auth để mình dùng
+            - Object cũ của Provider này (Products) trc khi reload -> để mình
+            có thể update lại những thuộc tính ko đổi để nó ko bị mất 
+            
+            bên cạnh đó: create nữa (video bị thiếu cái này)*/
+
+          create: (_) => Products('', []),
+          update: (ctx, auth, previousProducts) => Products(
+            auth.token as String,
+            /* ở đây mình phải update để giữ lại List Product
+            nhưng ở lần khởi chạy đầu tiên thì list null -> phải check null,
+            nếu null thì return về list rỗng thôi */
+            previousProducts == null ? [] : previousProducts.items,
+          ),
         ),
         /* Tạo Provider cho Cart */
         ChangeNotifierProvider(
@@ -47,10 +78,6 @@ class MyApp extends StatelessWidget {
         /* Tạo Provider cho Order */
         ChangeNotifierProvider(
           create: (ctx) => Orders(),
-        ),
-        /* Provider cho auth */
-        ChangeNotifierProvider(
-          create: (ctx) => Auth(),
         ),
       ],
       //child : nó sẽ Listen cho tất cả các Provider trong list trên kia

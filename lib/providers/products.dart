@@ -10,6 +10,13 @@ import 'product.dart';
 
 //Class chứa data cho Data Provider phải mix-in với ChangeNotifier
 class Products with ChangeNotifier {
+  //String để lưu giữ Token khi Authentication
+  final String authToken;
+
+  /*nhận token qua constructor 
+  (truyền vào trong main.dart ở Provider khi khởi tạo Object)*/
+  Products(this.authToken, this._items);
+
   List<Product> _items = [
     // Product(
     //   id: 'p1',
@@ -211,8 +218,9 @@ class Products with ChangeNotifier {
 
   /* Lấy list Product từ Web Server */
   Future<void> fetchAndSetProducts() async {
-    const url =
-        'https://learn-flutter-shop-app-7cbf5-default-rtdb.firebaseio.com/products.json';
+    //gắn token vào URL để lấy data sau khi đã authenticate
+    final url =
+        'https://learn-flutter-shop-app-7cbf5-default-rtdb.firebaseio.com/products.json?auth=$authToken';
     //Dùng get request để lấy data
     try {
       final response = await http.get(Uri.parse(url));
