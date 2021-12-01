@@ -15,15 +15,17 @@ class UserProductsScreen extends StatelessWidget {
     //Dùng async - await để khi nào fetch data xong mới return
     await Provider.of<Products>(
       context,
-      listen: false,
       /* My customization: phải thêm listen: false nếu không sẽ lỗi */
-    ).fetchAndSetProducts();
+      listen: false,
+      //chỗ này chỉ hiện product của user thôi (để manage) -> truyền vào filterByUser = true
+    ).fetchAndSetProducts(true);
   }
 
   @override
   Widget build(BuildContext context) {
     //Set up Listener -> Product Provider
-    final productsData = Provider.of<Products>(context);
+    //Không dùng cái này đc nữa vì nếu dùng sẽ bị infinite loop
+    //final productsData = Provider.of<Products>(context);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Your Products'),
@@ -40,26 +42,39 @@ class UserProductsScreen extends StatelessWidget {
       ),
       //1 cái app drawer như các màn hình
       drawer: const AppDrawer(),
-      //Tạo cái RefreshIndicator để có tính năng Pull-to-refresh
-      body: RefreshIndicator(
-        onRefresh: () => _refreshProducts(context),
-        child: Padding(
-          padding: const EdgeInsets.all(8),
-          //Hiển thị List Product
-          child: ListView.builder(
-            itemCount: productsData.items.length,
-            itemBuilder: (_, i) => Column(
-              children: [
-                UserProductItem(
-                  productsData.items[i].id,
-                  productsData.items[i].title,
-                  productsData.items[i].imageUrl,
-                ),
-                const Divider(),
-              ],
-            ),
-          ),
-        ),
+      //Dùng FutureBuilder để lấy lại list product từ server mỗi khi chuyển sang màn hình này
+      body: FutureBuilder(
+        future: _refreshProducts(context),
+        builder: (ctx, snapshot) =>
+            snapshot.connectionState == ConnectionState.waiting
+                ? Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : RefreshIndicator(
+                    //Tạo cái RefreshIndicator để có tính năng Pull-to-refresh
+                    onRefresh: () => _refreshProducts(context),
+                    /*chuyển sang dùng Consumer vì cái Provider của productsData
+                    trên kia ko dùng đc nữa*/
+                    child: Consumer<Products>(
+                      builder: (ctx, productsData, _) => Padding(
+                        padding: const EdgeInsets.all(8),
+                        //Hiển thị List Product
+                        child: ListView.builder(
+                          itemCount: productsData.items.length,
+                          itemBuilder: (_, i) => Column(
+                            children: [
+                              UserProductItem(
+                                productsData.items[i].id,
+                                productsData.items[i].title,
+                                productsData.items[i].imageUrl,
+                              ),
+                              const Divider(),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
       ),
     );
   }

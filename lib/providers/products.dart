@@ -115,6 +115,8 @@ class Products with ChangeNotifier {
           'description': product.description,
           'imageUrl': product.imageUrl,
           'price': product.price,
+          //gắn product vs user
+          'creatorId': userId,
         }),
         /* Dùng package http để gửi 1 Post request đến url đó;
       1 số argument: 
@@ -217,10 +219,19 @@ class Products with ChangeNotifier {
   }
 
   /* Lấy list Product từ Web Server */
-  Future<void> fetchAndSetProducts() async {
+  /* Không phải lúc nào mình cũng muốn filter: truyền vào 1 positional argument
+  (ko bắt buộc phải có -> cho vào [ ] , mặc định là false) 
+  nếu truyền vào là true thì mới Filter*/
+  Future<void> fetchAndSetProducts([bool filterByUser = false]) async {
+    /*nếu ng dùng muốn Filter thì mới cho thêm đoạn này:
+    Lấy những Product của User tương ứng 
+    Truy vấn kiểu này là của Firebase*/
+    final filterString =
+        filterByUser ? 'orderBy="creatorId"&equalTo="$userId"' : '';
+
     //gắn token vào URL để lấy data sau khi đã authenticate
     var url =
-        'https://learn-flutter-shop-app-7cbf5-default-rtdb.firebaseio.com/products.json?auth=$authToken';
+        'https://learn-flutter-shop-app-7cbf5-default-rtdb.firebaseio.com/products.json?auth=$authToken&$filterString';
     //Dùng get request để lấy data
     try {
       final response = await http.get(Uri.parse(url));
