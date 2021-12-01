@@ -5,6 +5,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+//package để dùng sharedPreferences
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/http_exception.dart';
 
@@ -102,6 +104,24 @@ class Auth with ChangeNotifier {
       _autoLogout();
 
       notifyListeners();
+
+      /* Lưu trữ Token vào SharedPreferences cho tính năng auto Login;
+      cái này có dùng Future nên phải cho vào async (ở đây có sẵn r) */
+
+      /*truy cập SharedPreferences để dùng (cái này return về Future, mà sau đó 
+      sẽ return về SharedPreferences) -> dùng cái này để truy cập vào device storage*/
+      final prefs = await SharedPreferences.getInstance();
+      /* giờ có thể dùng prefs để read/write data vào storage:
+      write: set() method, có thể write string, boolean,...
+      nếu có 1 map thì có thể convert về json rồi write vì json sẽ đc convert
+      thành String*/
+      final userData = json.encode({
+        'token': _token,
+        'userId': _userId,
+        'expiryDate': _expiryDate!.toIso8601String(),
+      });
+      //lưu trữ theo kiểu key-data
+      prefs.setString('userData', userData);
     } catch (error) {
       rethrow;
     }
@@ -109,8 +129,45 @@ class Auth with ChangeNotifier {
     //print(json.decode(response.body));
   }
 
+  /* method để lấy dữ liệu từ device storage để tự động login khi mở app,
+  nếu thành công thì return true */
+  Future<bool> tryAutoLogin() async {
+    //get access to SharedPreferences
+    final prefs = await SharedPreferences.getInstance();
+
+    //kiểm tra xem có data ko
+    if (!prefs.containsKey('userData')) {
+      //nếu ko có SharedPreferences với key này thì là ko có thông tin để auto login
+      return false;
+    }
+
+    //extract user data: lấy String có key là 'userData' và decode sang Map
+    final extractedUserData = json.decode(prefs.getString('userData') as String)
+        as Map<String, Object>;
+
+    //kiểm tra xem data có valid ko
+    final expiryDate =
+        DateTime.parse(extractedUserData['expiryDate'] as String);
+    if (expiryDate.isBefore(DateTime.now())) {
+      //nếu expiryDate trc DateTime.now() -> token expire rồi
+      return false;
+    }
+
+    //data valid -> set lại các attribute và tự động login
+    _token = extractedUserData['token'] as String;
+    _userId = extractedUserData['userId'] as String;
+    _expiryDate = expiryDate;
+
+    notifyListeners();
+
+    //gọi auto logout để reset timer
+    _autoLogout();
+
+    return true;
+  }
+
   //Log user out
-  void logout() {
+  Future<void> logout() async {
     _token = null;
     _userId = null;
     _expiryDate = null;
@@ -123,6 +180,11 @@ class Auth with ChangeNotifier {
     }
 
     notifyListeners();
+
+    /* Xóa data trong SharedPreferences đi kẻo nó lại tự login lại */
+    final prefs = await SharedPreferences.getInstance();
+    //prefs.remove('userData'); //xóa 1 data nhất định
+    prefs.clear(); //xóa hết: dùng cx đc vì mình chỉ có 1 cái
   }
 
   //Tự động log out sau 1 thời gian (khi token expire)
@@ -136,6 +198,6 @@ class Auth with ChangeNotifier {
     final timeToExpiry = _expiryDate!.difference(DateTime.now()).inSeconds;
     /*dùng class Timer trong library dart:async để set timer, truyền vào 1 
     Duration để expire và 1 function để thực hiện khi expire*/
-    _authTimer = Timer(Duration(seconds: 3), logout);
+    _authTimer = Timer(Duration(seconds: timeToExpiry), logout);
   }
 }

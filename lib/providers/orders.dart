@@ -25,9 +25,9 @@ class OrderItem {
 class Orders with ChangeNotifier {
   List<OrderItem> _orders = [];
   //authToken để gửi requests đến server
-  final String authToken;
+  final String? authToken;
   //gắn order với user
-  final String userId;
+  final String? userId;
 
   //constructor (như Products)
   Orders(this.authToken, this.userId, this._orders);

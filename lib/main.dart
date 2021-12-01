@@ -13,6 +13,7 @@ import './screens/user_products_screen.dart';
 import './screens/edit_product_screen.dart';
 import './screens/auth_screen.dart';
 import './providers/auth.dart';
+import './screens/splash_screen.dart';
 
 void main() => runApp(MyApp());
 
@@ -81,8 +82,8 @@ class MyApp extends StatelessWidget {
           //tương tự như Products
           create: (_) => Orders('', '', []),
           update: (ctx, auth, previousOrders) => Orders(
-            auth.token as String,
-            auth.userId as String,
+            auth.token,
+            auth.userId,
             previousOrders == null ? [] : previousOrders.orders,
           ),
         ),
@@ -103,7 +104,21 @@ class MyApp extends StatelessWidget {
             fontFamily: 'Lato',
           ),
           /* Kiểm tra xem đã login chưa -> nếu rồi thì chuyển về Home */
-          home: auth.isAuth ? ProductsOverviewScreen() : AuthScreen(),
+          /* auto login: nếu chưa login thì thử gọi tryAutoLogin(), trong lúc đợi
+          Future thì hiển thị màn hình chờ, đợi xong thì hiển thị AuthScreen()
+          (ko cần check xem nó return true hay false, vì nếu nó auto login thành
+          công thì nó sẽ gọi notifyListener() -> widget này sẽ tự rebuild, và
+          khi nó check lại auth.isAuth thì sẽ return true -> về ProductsOverView) */
+          home: auth.isAuth
+              ? ProductsOverviewScreen()
+              : FutureBuilder(
+                  future: auth.tryAutoLogin(),
+                  builder: (ctx, authResultSnapshot) =>
+                      authResultSnapshot.connectionState ==
+                              ConnectionState.waiting
+                          ? SplashScreen()
+                          : AuthScreen(),
+                ),
           routes: {
             ProductDetailScreen.routeName: (ctx) => ProductDetailScreen(),
             CartScreen.routeName: (ctx) => CartScreen(),

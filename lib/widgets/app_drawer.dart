@@ -63,6 +63,8 @@ class AppDrawer extends StatelessWidget {
               /*trg khi logout thì phải tắt drawer đi ko nó sẽ lỗi
               (video thì lỗi thôi chứ code của mình cx chả lỗi)*/
               Navigator.of(context).pop();
+              //chuyển về home route trc khi logout, để tránh bị mấy lỗi linh tinh
+              Navigator.of(context).pushReplacementNamed('/');
               //gọi đến logout của auth.dart
               Provider.of<Auth>(context, listen: false).logout();
             },
