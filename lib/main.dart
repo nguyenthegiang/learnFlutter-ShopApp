@@ -79,9 +79,10 @@ class MyApp extends StatelessWidget {
         /* Tạo Provider cho Order */
         ChangeNotifierProxyProvider<Auth, Orders>(
           //tương tự như Products
-          create: (_) => Orders('', []),
+          create: (_) => Orders('', '', []),
           update: (ctx, auth, previousOrders) => Orders(
             auth.token as String,
+            auth.userId as String,
             previousOrders == null ? [] : previousOrders.orders,
           ),
         ),
