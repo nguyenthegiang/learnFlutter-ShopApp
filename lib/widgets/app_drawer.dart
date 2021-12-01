@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
+import 'package:provider/provider.dart';
+
 import '../screens/orders_screen.dart';
 import '../screens/user_products_screen.dart';
+import '../providers/auth.dart';
 
 //Drawer để chuyển giữa product overview và order
 class AppDrawer extends StatelessWidget {
@@ -48,6 +51,20 @@ class AppDrawer extends StatelessWidget {
             onTap: () {
               Navigator.of(context)
                   .pushReplacementNamed(UserProductsScreen.routeName);
+            },
+          ),
+
+          const Divider(),
+          ListTile(
+            //Ấn vào cái này để đến Logout
+            leading: const Icon(Icons.exit_to_app),
+            title: const Text('Logout'),
+            onTap: () {
+              /*trg khi logout thì phải tắt drawer đi ko nó sẽ lỗi
+              (video thì lỗi thôi chứ code của mình cx chả lỗi)*/
+              Navigator.of(context).pop();
+              //gọi đến logout của auth.dart
+              Provider.of<Auth>(context, listen: false).logout();
             },
           ),
         ],

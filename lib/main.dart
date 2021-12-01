@@ -64,8 +64,8 @@ class MyApp extends StatelessWidget {
 
           create: (_) => Products('', '', []),
           update: (ctx, auth, previousProducts) => Products(
-            auth.token as String,
-            auth.userId as String,
+            auth.token,
+            auth.userId,
             /* ở đây mình phải update để giữ lại List Product
             nhưng ở lần khởi chạy đầu tiên thì list null -> phải check null,
             nếu null thì return về list rỗng thôi */

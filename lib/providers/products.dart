@@ -11,8 +11,8 @@ import 'product.dart';
 //Class chứa data cho Data Provider phải mix-in với ChangeNotifier
 class Products with ChangeNotifier {
   //String để lưu giữ Token khi Authentication
-  final String authToken;
-  final String userId;
+  final String? authToken;
+  final String? userId;
 
   /*nhận token qua constructor 
   (truyền vào trong main.dart ở Provider khi khởi tạo Object)*/

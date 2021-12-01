@@ -101,4 +101,13 @@ class Auth with ChangeNotifier {
 
     //print(json.decode(response.body));
   }
+
+  //Log user out
+  void logout() {
+    _token = null;
+    _userId = null;
+    _expiryDate = null;
+
+    notifyListeners();
+  }
 }
